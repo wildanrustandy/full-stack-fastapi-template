@@ -1,3 +1,4 @@
+import random
 import secrets
 import uuid
 from typing import Any
@@ -5,11 +6,16 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
 
-from app.api.deps import SessionDep
+from app.api.deps import CurrentUser, SessionDep
 from app import crud
-from app.models import DeviceSession, DeviceSessionPublic
+from app.models import DeviceSession, DeviceSessionPublic, BoothPublic
 
 router = APIRouter(prefix="/devices", tags=["devices"])
+
+
+def generate_pin() -> str:
+    """Generate a random 6-digit PIN."""
+    return f"{random.randint(0, 999999):06d}"
 
 
 @router.post("/register", response_model=DeviceSessionPublic)
@@ -37,13 +43,16 @@ def register_device(
         )
         return existing_device
 
-    # Create new device session with a token
+    # Create new device session with a token and PIN
     session_token = secrets.token_urlsafe(32)
+    pin = generate_pin()
+
     device_session = crud.create_device_session(
         session=session,
         device_id=device_id,
         device_name=device_name,
         session_token=session_token,
+        pin=pin,
     )
     return device_session
 
@@ -71,6 +80,7 @@ def check_device_assignment(
         "booth_id": device_session.booth_id,
         "booth_name": booth.name if booth else None,
         "is_assigned": device_session.booth_id is not None,
+        "pin": device_session.pin,
     }
 
 
@@ -88,3 +98,46 @@ def device_heartbeat(
     if not device:
         raise HTTPException(status_code=404, detail="Device not found")
     return device
+
+
+@router.post("/assign-by-pin", response_model=BoothPublic)
+def assign_device_by_pin(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    data: dict[str, Any],
+) -> Any:
+    """
+    Assign a device to a booth using its 6-digit PIN.
+    This is more user-friendly than entering the full device ID.
+    """
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+
+    pin = data.get("pin")
+    booth_id = data.get("booth_id")
+
+    if not pin or not booth_id:
+        raise HTTPException(status_code=400, detail="pin and booth_id are required")
+
+    if len(pin) != 6 or not pin.isdigit():
+        raise HTTPException(status_code=400, detail="PIN must be 6 digits")
+
+    # Find device by PIN
+    statement = select(DeviceSession).where(DeviceSession.pin == pin)
+    device_session = session.exec(statement).first()
+
+    if not device_session:
+        raise HTTPException(status_code=404, detail="Device not found with this PIN")
+
+    # Assign device to booth
+    booth = crud.assign_device_to_booth(
+        session=session,
+        booth_id=uuid.UUID(booth_id),
+        device_id=device_session.device_id,
+    )
+
+    if not booth:
+        raise HTTPException(status_code=404, detail="Booth not found")
+
+    return booth

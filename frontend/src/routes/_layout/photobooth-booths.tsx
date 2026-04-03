@@ -6,7 +6,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, Dialog
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
-import { useBooths, useCreateBooth, useDeleteBooth, useAssignDevice, useUnassignDevice } from "@/hooks/usePhotobooth"
+import { useBooths, useCreateBooth, useDeleteBooth, useUnassignDevice } from "@/hooks/usePhotobooth"
+import { AssignDeviceByPinDialog } from "@/components/Booths/AssignDeviceByPinDialog"
 import useCustomToast from "@/hooks/useCustomToast"
 import { UsersService } from "@/client"
 import { Plus, Trash2, MapPin, Settings, Monitor, X } from "lucide-react"
@@ -25,10 +26,7 @@ export const Route = createFileRoute("/_layout/photobooth-booths")({
 function BoothCard({ booth }: { booth: any }) {
   const { showSuccessToast, showErrorToast } = useCustomToast()
   const deleteBooth = useDeleteBooth()
-  const assignDevice = useAssignDevice()
   const unassignDevice = useUnassignDevice()
-  const [assignOpen, setAssignOpen] = useState(false)
-  const [deviceId, setDeviceId] = useState("")
 
   const handleDelete = async () => {
     try {
@@ -36,20 +34,6 @@ function BoothCard({ booth }: { booth: any }) {
       showSuccessToast("Booth deleted")
     } catch (error) {
       showErrorToast("Failed to delete booth")
-    }
-  }
-
-  const handleAssign = async () => {
-    if (!deviceId.trim()) return
-    console.log("Assigning device:", { boothId: booth.id, deviceId: deviceId.trim(), booth })
-    try {
-      await assignDevice.mutateAsync({ boothId: booth.id, deviceId: deviceId.trim() })
-      showSuccessToast("Device assigned successfully")
-      setDeviceId("")
-      setAssignOpen(false)
-    } catch (error) {
-      console.error("Assign failed:", error)
-      showErrorToast("Failed to assign device. Check if device ID is valid.")
     }
   }
 
@@ -96,41 +80,10 @@ function BoothCard({ booth }: { booth: any }) {
               </Button>
             </div>
           ) : (
-            <Dialog open={assignOpen} onOpenChange={setAssignOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="w-full">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Assign Device
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Assign Device to {booth.name}</DialogTitle>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="deviceId">Device ID</Label>
-                    <Input 
-                      id="deviceId" 
-                      value={deviceId} 
-                      onChange={(e) => setDeviceId(e.target.value)} 
-                      placeholder="e.g., dev_aB3x9KpL2mN7qR5s"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Enter the device ID shown on the kiosk waiting screen
-                    </p>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button 
-                    onClick={handleAssign} 
-                    disabled={!deviceId.trim() || assignDevice.isPending}
-                  >
-                    {assignDevice.isPending ? "Assigning..." : "Assign"}
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+            <AssignDeviceByPinDialog 
+              boothId={booth.id} 
+              boothName={booth.name}
+            />
           )}
         </div>
 

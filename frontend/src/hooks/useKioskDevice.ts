@@ -5,6 +5,7 @@ const STORAGE_KEY = "kiosk_device_id"
 
 export function useKioskDevice() {
   const [deviceId, setDeviceId] = useState<string | null>(null)
+  const [pin, setPin] = useState<string | null>(null)
   const [isAssigned, setIsAssigned] = useState<boolean | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [booth, setBooth] = useState<any>(null)
@@ -27,7 +28,8 @@ export function useKioskDevice() {
 
       // Register device with backend
       try {
-        await DevicesService.registerDevice(existingId, "Kiosk")
+        const device = await DevicesService.registerDevice(existingId, "Kiosk")
+        setPin(device.pin)
         setIsRegistered(true)
       } catch (error) {
         console.error("Failed to register device:", error)
@@ -45,6 +47,10 @@ export function useKioskDevice() {
         } else {
           setIsAssigned(false)
           setBooth(null)
+        }
+        // Update PIN from check result in case registration didn't return it
+        if (result.pin) {
+          setPin(result.pin)
         }
       } catch (error) {
         console.error("Failed to check assignment:", error)
@@ -81,6 +87,7 @@ export function useKioskDevice() {
 
   return {
     deviceId,
+    pin,
     isAssigned,
     isLoading,
     isRegistered,

@@ -225,6 +225,9 @@ class DeviceSession(DeviceSessionBase, table=True):
         default=None, foreign_key="booths.id", ondelete="CASCADE"
     )
     session_token: str = Field(max_length=255, unique=True)
+    pin: str | None = Field(
+        default=None, max_length=6
+    )  # 6-digit PIN for easy assignment
     is_active: bool = True
     connected_at: datetime | None = Field(
         default_factory=get_datetime_utc,
@@ -242,6 +245,7 @@ class DeviceSession(DeviceSessionBase, table=True):
 class DeviceSessionPublic(DeviceSessionBase):
     id: uuid.UUID
     booth_id: uuid.UUID | None = None
+    pin: str | None = None
     is_active: bool = True
     connected_at: datetime | None = None
     last_heartbeat: datetime | None = None

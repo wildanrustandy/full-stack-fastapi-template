@@ -8,9 +8,9 @@ export const Route = createFileRoute("/_kiosk/waiting-assignment")({
 })
 
 function WaitingAssignment() {
-  const { deviceId, isAssigned, isLoading, checkAssignment } = useKioskDevice()
+  const { deviceId, pin, isAssigned, isLoading } = useKioskDevice()
   const [dots, setDots] = useState(".")
-  const [connectionStatus, setConnectionStatus] = useState<"connected" | "disconnected">("connected")
+  const [connectionStatus] = useState<"connected" | "disconnected">("connected")
 
   // Animated dots
   useEffect(() => {
@@ -19,21 +19,6 @@ function WaitingAssignment() {
     }, 500)
     return () => clearInterval(interval)
   }, [])
-
-  // Check connection status periodically
-  useEffect(() => {
-    const checkConnection = async () => {
-      try {
-        await checkAssignment()
-        setConnectionStatus("connected")
-      } catch {
-        setConnectionStatus("disconnected")
-      }
-    }
-
-    const interval = setInterval(checkConnection, 5000)
-    return () => clearInterval(interval)
-  }, [checkAssignment])
 
   // Redirect if assigned
   if (isAssigned) {
@@ -76,17 +61,24 @@ function WaitingAssignment() {
           </p>
         </div>
 
-        {/* Device ID Display */}
-        <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
-          <p className="text-sm text-muted-foreground uppercase tracking-wider">
-            Device ID
-          </p>
-          <code className="text-2xl font-mono bg-black/50 px-4 py-2 rounded-lg block">
-            {deviceId}
-          </code>
-          <p className="text-sm text-muted-foreground">
-            Show this ID to an administrator to assign this device to a booth
-          </p>
+        {/* PIN Display */}
+        {pin && (
+          <div className="bg-white/5 border border-white/10 rounded-xl p-6 space-y-4">
+            <p className="text-sm text-muted-foreground uppercase tracking-wider">
+              Enter this PIN in Admin Panel
+            </p>
+            <div className="text-5xl font-mono font-bold tracking-widest bg-black/50 px-8 py-4 rounded-lg">
+              {pin}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Go to Admin → Booths → Assign Device and enter this 6-digit code
+            </p>
+          </div>
+        )}
+
+        {/* Device ID (small, for reference) */}
+        <div className="text-xs text-muted-foreground">
+          Device: <code className="bg-white/5 px-2 py-1 rounded">{deviceId}</code>
         </div>
 
         {/* Loading indicator */}
@@ -99,9 +91,9 @@ function WaitingAssignment() {
         <div className="text-sm text-muted-foreground space-y-1">
           <p>To complete setup:</p>
           <ol className="list-decimal list-inside space-y-1">
-            <li>Go to Admin Panel → Booths</li>
-            <li>Select a booth or create a new one</li>
-            <li>Click "Assign Device" and enter the Device ID above</li>
+            <li>Go to Admin Panel → Photobooth → Booths</li>
+            <li>Select a booth and click "Assign Device"</li>
+            <li>Enter the 6-digit PIN shown above</li>
           </ol>
         </div>
       </div>

@@ -6,6 +6,7 @@ export interface DeviceSession {
   device_id: string
   device_name: string | null
   booth_id: string | null
+  pin: string | null
   is_active: boolean
   connected_at: string | null
   last_heartbeat: string | null
@@ -16,6 +17,7 @@ export interface DeviceAssignmentCheck {
   booth_id: string | null
   booth_name: string | null
   is_assigned: boolean
+  pin: string | null
 }
 
 export const DevicesService = {
@@ -58,6 +60,27 @@ export const DevicesService = {
     
     if (!response.ok) {
       throw new Error(`Failed to send heartbeat: ${response.status}`)
+    }
+    
+    return response.json()
+  },
+
+  async assignDeviceByPin(pin: string, boothId: string): Promise<any> {
+    const token = localStorage.getItem("access_token")
+    const response = await fetch(`${API_BASE}/api/v1/devices/assign-by-pin`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        pin,
+        booth_id: boothId,
+      }),
+    })
+    
+    if (!response.ok) {
+      throw new Error(`Failed to assign device: ${response.status}`)
     }
     
     return response.json()

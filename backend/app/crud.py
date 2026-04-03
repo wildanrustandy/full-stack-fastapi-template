@@ -322,11 +322,13 @@ def create_device_session(
     device_id: str,
     device_name: str | None = None,
     session_token: str = "",
+    pin: str | None = None,
 ) -> DeviceSession:
     db_device = DeviceSession(
         device_id=device_id,
         device_name=device_name,
         session_token=session_token,
+        pin=pin,
     )
     session.add(db_device)
     session.commit()

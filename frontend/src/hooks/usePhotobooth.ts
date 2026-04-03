@@ -123,20 +123,6 @@ const useDeleteBooth = () => {
   })
 }
 
-// Device assignment hooks
-const useAssignDevice = () => {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: ({ boothId, deviceId }: { boothId: string; deviceId: string }) => {
-      console.log("useAssignDevice called with:", { boothId, deviceId })
-      return BoothsService.assignDevice({ id: boothId, requestBody: { device_id: deviceId } })
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["booths"] })
-    },
-  })
-}
-
 const useUnassignDevice = () => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -161,6 +147,5 @@ export {
   useCreateBooth,
   useUpdateBooth,
   useDeleteBooth,
-  useAssignDevice,
   useUnassignDevice,
 }
