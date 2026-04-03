@@ -123,6 +123,7 @@ async def notify_device_assignment(
     booth_id: str | None,
     booth_name: str | None = None,
     booth_location: str | None = None,
+    booth_config: dict | None = None,
     booth_active: bool = True,
     reason: str | None = None,
 ) -> bool:
@@ -139,6 +140,7 @@ async def notify_device_assignment(
                     "booth_id": booth_id,
                     "booth_name": booth_name,
                     "booth_location": booth_location,
+                    "booth_config": booth_config,
                     "booth_active": booth_active,
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                 }

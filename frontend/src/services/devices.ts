@@ -17,6 +17,7 @@ export interface DeviceAssignmentCheck {
   booth_id: string | null
   booth_name: string | null
   booth_location: string | null
+  booth_config: Record<string, any> | null
   booth_active: boolean
   is_assigned: boolean
   pin: string | null

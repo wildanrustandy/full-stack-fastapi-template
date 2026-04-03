@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { z } from "zod"
 import ProgressIndicator from "@/components/Kiosk/ProgressIndicator"
 import BoothNameHeader from "@/components/Kiosk/BoothNameHeader"
+import { useKioskDevice } from "@/hooks/useKioskDevice"
 
 const printCountSearchSchema = z.object({
   boothId: z.string().optional(),
@@ -13,7 +14,7 @@ export const Route = createFileRoute("/_kiosk/print-count")({
   validateSearch: printCountSearchSchema,
 })
 
-const PRICE_PER_SHEET = 35000
+const DEFAULT_PRICE_PER_SHEET = 35000
 const MIN_PRINT = 1
 const MAX_PRINT = 10
 
@@ -23,8 +24,10 @@ function formatRupiah(amount: number): string {
 
 function PrintCountPage() {
   const navigate = useNavigate()
+  const { booth } = useKioskDevice()
   const [printCount, setPrintCount] = useState(1)
-  const total = printCount * PRICE_PER_SHEET
+  const pricePerSheet = booth?.config?.price_per_print || DEFAULT_PRICE_PER_SHEET
+  const total = printCount * pricePerSheet
 
   return (
     <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: "var(--k-background)" }}>
@@ -84,7 +87,7 @@ function PrintCountPage() {
               <div className="mb-4 flex items-center justify-between lg:mb-6">
                 <span className="font-label text-base font-bold lg:text-lg" style={{ color: "var(--k-on-surface)" }}>Quantity</span>
                 <div className="rounded-full px-3 py-1 text-xs font-bold lg:px-4 lg:text-sm" style={{ background: "var(--k-secondary-container)", color: "var(--k-on-secondary-container)" }}>
-                  {formatRupiah(PRICE_PER_SHEET)} / lembar
+                  {formatRupiah(pricePerSheet)} / lembar
                 </div>
               </div>
 

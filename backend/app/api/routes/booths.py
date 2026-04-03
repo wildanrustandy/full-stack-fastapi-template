@@ -150,6 +150,7 @@ async def assign_device(
         booth_id=str(booth.id),
         booth_name=booth.name,
         booth_location=booth.location,
+        booth_config=booth.config,
         booth_active=booth.is_active,
     )
 

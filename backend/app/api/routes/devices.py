@@ -84,6 +84,7 @@ def check_device_assignment(
         "booth_id": str(device_session.booth_id) if device_session.booth_id else None,
         "booth_name": booth.name if booth else None,
         "booth_location": booth.location if booth else None,
+        "booth_config": booth.config if booth else None,
         "booth_active": booth_active,
         "is_assigned": is_effectively_assigned,
         "pin": device_session.pin,
@@ -154,6 +155,7 @@ async def assign_device_by_pin(
         booth_id=str(booth.id),
         booth_name=booth.name,
         booth_location=booth.location,
+        booth_config=booth.config,
         booth_active=booth.is_active,
     )
 

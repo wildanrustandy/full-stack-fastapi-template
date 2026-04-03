@@ -54,6 +54,7 @@ export function useKioskDevice() {
             id: result.booth_id,
             name: result.booth_name,
             location: result.booth_location,
+            config: result.booth_config,
           })
           setIsInactiveBooth(false)
         } else if (result.booth_id && !result.booth_active) {
@@ -63,6 +64,7 @@ export function useKioskDevice() {
             id: result.booth_id,
             name: result.booth_name,
             location: result.booth_location,
+            config: result.booth_config,
           })
           setIsInactiveBooth(true)
         } else {
@@ -129,6 +131,7 @@ export function useKioskDevice() {
             id: data.booth_id,
             name: data.booth_name,
             location: data.booth_location,
+            config: data.booth_config,
           })
           setUnassignedReason(null)
         } else if (data.type === "unassigned") {
@@ -197,6 +200,7 @@ export function useKioskDevice() {
             id: result.booth_id,
             name: result.booth_name,
             location: result.booth_location,
+            config: result.booth_config,
           })
           setIsInactiveBooth(false)
         } else if (result.booth_id && !result.booth_active) {
@@ -206,6 +210,7 @@ export function useKioskDevice() {
             id: result.booth_id,
             name: result.booth_name,
             location: result.booth_location,
+            config: result.booth_config,
           })
           setIsInactiveBooth(true)
         } else {
