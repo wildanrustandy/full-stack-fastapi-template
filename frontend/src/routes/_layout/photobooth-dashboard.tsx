@@ -1,11 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, redirect } from "@tanstack/react-router"
 import { Suspense } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useDashboardOverview, useRecentTransactions } from "@/hooks/usePhotobooth"
+import { UsersService } from "@/client"
 import { BarChart3, DollarSign, Camera, Activity } from "lucide-react"
 
 export const Route = createFileRoute("/_layout/photobooth-dashboard")({
   component: PhotoboothDashboard,
+  beforeLoad: async () => {
+    const user = await UsersService.readUserMe()
+    if (!user.is_superuser) {
+      throw redirect({ to: "/" })
+    }
+  },
   head: () => ({ meta: [{ title: "Photobooth Dashboard - FastAPI Template" }] }),
 })
 

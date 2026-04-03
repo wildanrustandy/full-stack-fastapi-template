@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, redirect } from "@tanstack/react-router"
 import { Suspense, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,10 +8,17 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { useBooths, useCreateBooth, useDeleteBooth } from "@/hooks/usePhotobooth"
 import useCustomToast from "@/hooks/useCustomToast"
+import { UsersService } from "@/client"
 import { Plus, Trash2, MapPin, Settings } from "lucide-react"
 
 export const Route = createFileRoute("/_layout/photobooth-booths")({
   component: PhotoboothBooths,
+  beforeLoad: async () => {
+    const user = await UsersService.readUserMe()
+    if (!user.is_superuser) {
+      throw redirect({ to: "/" })
+    }
+  },
   head: () => ({ meta: [{ title: "Booths - FastAPI Template" }] }),
 })
 

@@ -1,13 +1,19 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, redirect } from "@tanstack/react-router"
 import { Suspense } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { PhotoboothAdminService } from "@/client"
+import { PhotoboothAdminService, UsersService } from "@/client"
 
 export const Route = createFileRoute("/_layout/photobooth-transactions")({
   component: PhotoboothTransactions,
+  beforeLoad: async () => {
+    const user = await UsersService.readUserMe()
+    if (!user.is_superuser) {
+      throw redirect({ to: "/" })
+    }
+  },
   head: () => ({ meta: [{ title: "Transactions - FastAPI Template" }] }),
 })
 
@@ -50,9 +56,9 @@ function TransactionsContent() {
                 </TableRow>
               ) : (
                 txList.map((tx) => (
-                  <TableRow key={tx.id || tx.transaction_id}>
+                  <TableRow key={tx.id}>
                     <TableCell className="font-medium">{tx.reference_id || tx.transaction_id || "-"}</TableCell>
-                    <TableCell>{tx.booth_name || tx.booth_id || "-"}</TableCell>
+                    <TableCell>{tx.booth_id || "-"}</TableCell>
                     <TableCell>Rp {(tx.amount ?? 0).toLocaleString("id-ID")}</TableCell>
                     <TableCell>
                       <Badge variant={tx.status === "success" ? "default" : tx.status === "failed" ? "destructive" : "secondary"}>

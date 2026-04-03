@@ -304,7 +304,7 @@ def get_transactions(
     limit: int = 100,
 ) -> list[Payment]:
     statement = select(Payment).options(
-        selectinload(Payment).selectinload(KioskSession.booth)  # type: ignore[attr-defined]
+        selectinload(Payment.session).selectinload(KioskSession.booth)  # type: ignore[attr-defined]
     )
     if booth_id is not None:
         statement = statement.where(Payment.booth_id == booth_id)
