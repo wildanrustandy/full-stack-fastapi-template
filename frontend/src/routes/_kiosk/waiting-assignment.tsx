@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_kiosk/waiting-assignment")({
 })
 
 function WaitingAssignment() {
-  const { deviceId, pin, isAssigned, isLoading } = useKioskDevice()
+  const { deviceId, pin, isAssigned, unassignedReason } = useKioskDevice()
   const [dots, setDots] = useState(".")
   const [connectionStatus] = useState<"connected" | "disconnected">("connected")
 
@@ -20,17 +20,9 @@ function WaitingAssignment() {
     return () => clearInterval(interval)
   }, [])
 
-  // Redirect if assigned
-  if (isAssigned) {
+  // Redirect if assigned (but not if we were just unassigned)
+  if (isAssigned && !unassignedReason) {
     return <Navigate to="/landing" />
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <Loader2 className="h-12 w-12 animate-spin text-white" />
-      </div>
-    )
   }
 
   return (
@@ -55,9 +47,13 @@ function WaitingAssignment() {
 
         {/* Title */}
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold">Waiting for Assignment</h1>
+          <h1 className="text-3xl font-bold">
+            {unassignedReason ? "Disconnected" : "Waiting for Assignment"}
+          </h1>
           <p className="text-lg text-muted-foreground">
-            This kiosk needs to be assigned to a booth
+            {unassignedReason 
+              ? `Reason: ${unassignedReason}` 
+              : "This kiosk needs to be assigned to a booth"}
           </p>
         </div>
 

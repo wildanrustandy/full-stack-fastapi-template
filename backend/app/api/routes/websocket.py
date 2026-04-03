@@ -14,6 +14,7 @@ admin_connections: list[WebSocket] = []
 @router.websocket("/ws/device/{device_id}")
 async def device_websocket(websocket: WebSocket, device_id: str) -> None:
     await websocket.accept()
+    print(f"DEBUG: WebSocket connected for device: {device_id}")
     active_connections[device_id] = websocket
 
     await websocket.send_json(
@@ -118,29 +119,65 @@ async def kick_device(device_id: str, reason: str = "Device kicked by admin") ->
 
 
 async def notify_device_assignment(
-    device_id: str, booth_id: str | None, booth_name: str | None = None
+    device_id: str,
+    booth_id: str | None,
+    booth_name: str | None = None,
+    booth_location: str | None = None,
+    booth_active: bool = True,
+    reason: str | None = None,
 ) -> bool:
     """Notify device about assignment/unassignment change."""
+    print(
+        f"DEBUG notify_device_assignment: device_id={device_id}, booth_id={booth_id}, active_connections={list(active_connections.keys())}"
+    )
     if device_id in active_connections:
         ws = active_connections[device_id]
         try:
             if booth_id:
-                await ws.send_json(
-                    {
-                        "type": "assigned",
-                        "booth_id": booth_id,
-                        "booth_name": booth_name,
-                        "timestamp": datetime.now(timezone.utc).isoformat(),
-                    }
-                )
+                message = {
+                    "type": "assigned",
+                    "booth_id": booth_id,
+                    "booth_name": booth_name,
+                    "booth_location": booth_location,
+                    "booth_active": booth_active,
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                }
+                print(f"DEBUG: Sending assigned message: {message}")
+                await ws.send_json(message)
             else:
-                await ws.send_json(
-                    {
-                        "type": "unassigned",
-                        "timestamp": datetime.now(timezone.utc).isoformat(),
-                    }
-                )
+                message = {
+                    "type": "unassigned",
+                    "reason": reason or "Device unassigned",
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                }
+                print(f"DEBUG: Sending unassigned message: {message}")
+                await ws.send_json(message)
             return True
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"DEBUG: Error sending WebSocket message: {e}")
+    else:
+        print(f"DEBUG: Device {device_id} not in active_connections")
     return False
+
+
+async def broadcast_booth_update(booth_id: str, action: str = "updated") -> None:
+    """Broadcast booth update to all admin connections."""
+    message = {
+        "type": "booth_update",
+        "booth_id": booth_id,
+        "action": action,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    print(
+        f"DEBUG: Broadcasting booth update to {len(admin_connections)} admin connections: {message}"
+    )
+    disconnected = []
+    for ws in admin_connections:
+        try:
+            await ws.send_json(message)
+        except Exception as e:
+            print(f"DEBUG: Error sending to admin: {e}")
+            disconnected.append(ws)
+    for ws in disconnected:
+        if ws in admin_connections:
+            admin_connections.remove(ws)

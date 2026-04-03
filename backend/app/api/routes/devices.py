@@ -75,11 +75,17 @@ def check_device_assignment(
     if device_session.booth_id:
         booth = session.get(crud.Booth, device_session.booth_id)
 
+    # Consider booth inactive if booth exists but is not active
+    booth_active = booth.is_active if booth else False
+    is_effectively_assigned = device_session.booth_id is not None and booth_active
+
     return {
         "device_id": device_id,
-        "booth_id": device_session.booth_id,
+        "booth_id": str(device_session.booth_id) if device_session.booth_id else None,
         "booth_name": booth.name if booth else None,
-        "is_assigned": device_session.booth_id is not None,
+        "booth_location": booth.location if booth else None,
+        "booth_active": booth_active,
+        "is_assigned": is_effectively_assigned,
         "pin": device_session.pin,
     }
 
@@ -147,6 +153,11 @@ async def assign_device_by_pin(
         device_id=device_session.device_id,
         booth_id=str(booth.id),
         booth_name=booth.name,
+        booth_location=booth.location,
+        booth_active=booth.is_active,
     )
+
+    # Broadcast booth update to admin panel
+    await websocket.broadcast_booth_update(str(booth.id), "device_assigned")
 
     return booth

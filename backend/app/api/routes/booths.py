@@ -62,7 +62,7 @@ def read_booth(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) ->
 
 
 @router.put("/{id}", response_model=BoothPublic)
-def update_booth(
+async def update_booth(
     *,
     session: SessionDep,
     current_user: CurrentUser,
@@ -77,7 +77,27 @@ def update_booth(
     booth = crud.get_booth_by_id(session=session, booth_id=id)
     if not booth:
         raise HTTPException(status_code=404, detail="Booth not found")
+
+    was_active = booth.is_active
+    print(
+        f"DEBUG: Booth {id} was_active={was_active}, updating with booth_in={booth_in}"
+    )
     booth = crud.update_booth(session=session, db_booth=booth, booth_in=booth_in)
+    print(
+        f"DEBUG: After update, booth.is_active={booth.is_active}, device_id={booth.device_id}"
+    )
+
+    # If booth was deactivated and has a device assigned, notify the device
+    if was_active and not booth.is_active and booth.device_id:
+        print(f"DEBUG: Notifying device {booth.device_id} of deactivation")
+        from app.api.routes import websocket
+
+        await websocket.notify_device_assignment(
+            device_id=booth.device_id,
+            booth_id=None,  # Unassign
+            reason="Booth deactivated",
+        )
+
     return booth
 
 
@@ -126,8 +146,15 @@ async def assign_device(
     from app.api.routes import websocket
 
     await websocket.notify_device_assignment(
-        device_id=assign_data.device_id, booth_id=str(booth.id), booth_name=booth.name
+        device_id=assign_data.device_id,
+        booth_id=str(booth.id),
+        booth_name=booth.name,
+        booth_location=booth.location,
+        booth_active=booth.is_active,
     )
+
+    # Broadcast booth update to admin panel
+    await websocket.broadcast_booth_update(str(booth.id), "device_assigned")
 
     return booth
 
@@ -158,6 +185,9 @@ async def unassign_device(
         from app.api.routes import websocket
 
         await websocket.notify_device_assignment(device_id=device_id, booth_id=None)
+
+        # Broadcast booth update to admin panel
+        await websocket.broadcast_booth_update(str(booth.id), "device_unassigned")
 
     return booth
 

@@ -1,6 +1,7 @@
 import { createFileRoute, Navigate, Outlet, useLocation } from "@tanstack/react-router"
 import useKioskMode from "@/hooks/useKioskMode"
 import { useKioskDevice } from "@/hooks/useKioskDevice"
+import BoothInactiveOverlay from "@/components/Kiosk/BoothInactiveOverlay"
 import { Loader2 } from "lucide-react"
 
 export const Route = createFileRoute("/_kiosk")({
@@ -9,7 +10,7 @@ export const Route = createFileRoute("/_kiosk")({
 
 function KioskLayout() {
   useKioskMode({ idleTimeout: 120_000, preventBackButton: true })
-  const { isAssigned, isLoading } = useKioskDevice()
+  const { isAssigned, isLoading, wsUnassigned, unassignedReason, isInactiveBooth } = useKioskDevice()
   const location = useLocation()
 
   // Show loading state
@@ -21,21 +22,26 @@ function KioskLayout() {
     )
   }
 
-  // Redirect to waiting-assignment if not assigned
-  // But allow access to waiting-assignment page itself
   const isWaitingPage = location.pathname.includes("waiting-assignment")
-  if (!isAssigned && !isWaitingPage) {
-    return <Navigate to="/waiting-assignment" />
+  
+  // If WebSocket explicitly unassigned us (booth deactivated) OR if assigned to inactive booth
+  const isInactive = (wsUnassigned && unassignedReason?.includes("deactivated")) || isInactiveBooth
+  
+  // Redirect to waiting-assignment if not assigned and not inactive
+  if (!isAssigned && !isWaitingPage && !isInactive) {
+    return <Navigate to="/waiting-assignment" replace />
   }
 
   // If assigned and trying to access waiting-assignment, redirect to landing
   if (isAssigned && isWaitingPage) {
-    return <Navigate to="/landing" />
+    return <Navigate to="/landing" replace />
   }
 
   return (
-    <div className="kiosk h-dvh w-dvw overflow-hidden">
+    <div className="kiosk h-dvh w-dvw overflow-hidden relative">
       <Outlet />
+      {/* Show inactive overlay when booth is deactivated */}
+      {isInactive && <BoothInactiveOverlay />}
     </div>
   )
 }

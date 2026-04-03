@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Any
 
 from sqlalchemy.orm import selectinload
+from sqlalchemy.orm.attributes import flag_modified
 from sqlmodel import Session, col, select
 
 from app.core.security import get_password_hash, verify_password
@@ -130,7 +131,10 @@ def update_booth_config(
     update_data = config_in.model_dump(exclude_unset=True)
     current_config = db_booth.config or dict(BOOTH_DEFAULT_CONFIG)
     current_config.update(update_data)
-    db_booth.config = current_config
+    # Create a new dict to ensure SQLAlchemy detects the change
+    db_booth.config = dict(current_config)
+    # Mark the field as modified so SQLAlchemy saves it
+    flag_modified(db_booth, "config")
     session.add(db_booth)
     session.commit()
     session.refresh(db_booth)

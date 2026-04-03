@@ -8,7 +8,9 @@ import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { useBooths, useCreateBooth, useDeleteBooth, useUnassignDevice } from "@/hooks/usePhotobooth"
 import { AssignDeviceByPinDialog } from "@/components/Booths/AssignDeviceByPinDialog"
+import { EditBoothDialog } from "@/components/Booths/EditBoothDialog"
 import useCustomToast from "@/hooks/useCustomToast"
+import { useAdminWebSocket } from "@/hooks/useAdminWebSocket"
 import { UsersService } from "@/client"
 import { Plus, Trash2, MapPin, Settings, Monitor, X } from "lucide-react"
 
@@ -46,18 +48,33 @@ function BoothCard({ booth }: { booth: any }) {
     }
   }
 
+  const price = booth.config?.price_per_print || 35000
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg">{booth.name}</CardTitle>
-        <Badge variant={booth.is_active ? "default" : "secondary"}>
-          {booth.is_active ? "Active" : "Inactive"}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <CardTitle className="text-lg">{booth.name}</CardTitle>
+          <Badge variant={booth.is_active ? "default" : "secondary"}>
+            {booth.is_active ? "Active" : "Inactive"}
+          </Badge>
+        </div>
+        <div className="flex items-center gap-1">
+          <EditBoothDialog booth={booth} />
+          <Button variant="ghost" size="sm" onClick={handleDelete}>
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <MapPin className="h-4 w-4" />
           {booth.location || "No location"}
+        </div>
+        
+        <div className="mt-2 text-sm">
+          <span className="text-muted-foreground">Price: </span>
+          <span className="font-medium">Rp {price.toLocaleString('id-ID')}</span>
         </div>
         
         {/* Device Assignment Section */}
@@ -86,18 +103,15 @@ function BoothCard({ booth }: { booth: any }) {
             />
           )}
         </div>
-
-        <div className="mt-4 flex justify-end">
-          <Button variant="ghost" size="sm" onClick={handleDelete}>
-            <Trash2 className="h-4 w-4 text-destructive" />
-          </Button>
-        </div>
       </CardContent>
     </Card>
   )
 }
 
 function BoothsContent() {
+  // Connect to admin WebSocket for real-time updates
+  useAdminWebSocket()
+  
   const { data: boothsData } = useBooths()
   const createBooth = useCreateBooth()
   const { showSuccessToast } = useCustomToast()

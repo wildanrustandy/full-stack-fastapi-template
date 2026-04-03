@@ -105,8 +105,16 @@ const useCreateBooth = () => {
 const useUpdateBooth = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, ...data }: { id: string; name?: string; location?: string; is_active?: boolean }) =>
-      BoothsService.updateBooth({ id, requestBody: data as any }),
+    mutationFn: async ({ id, config, ...data }: { id: string; name?: string; location?: string; is_active?: boolean; config?: Record<string, unknown> }) => {
+      // Update basic booth info
+      const booth = await BoothsService.updateBooth({ id, requestBody: data as any })
+      // Update config if provided
+      if (config) {
+        const updatedBooth = await BoothsService.updateBoothConfig({ id, requestBody: config as any })
+        return updatedBooth
+      }
+      return booth
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["booths"] })
     },
