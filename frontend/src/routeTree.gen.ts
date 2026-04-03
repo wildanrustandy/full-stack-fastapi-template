@@ -22,6 +22,7 @@ import { Route as LayoutPhotoboothDashboardRouteImport } from './routes/_layout/
 import { Route as LayoutPhotoboothBoothsRouteImport } from './routes/_layout/photobooth-booths'
 import { Route as LayoutItemsRouteImport } from './routes/_layout/items'
 import { Route as LayoutAdminRouteImport } from './routes/_layout/admin'
+import { Route as KioskWaitingAssignmentRouteImport } from './routes/_kiosk/waiting-assignment'
 import { Route as KioskPrintCountRouteImport } from './routes/_kiosk/print-count'
 import { Route as KioskPreviewRouteImport } from './routes/_kiosk/preview'
 import { Route as KioskPhotoSessionRouteImport } from './routes/_kiosk/photo-session'
@@ -94,6 +95,11 @@ const LayoutAdminRoute = LayoutAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => LayoutRoute,
 } as any)
+const KioskWaitingAssignmentRoute = KioskWaitingAssignmentRouteImport.update({
+  id: '/waiting-assignment',
+  path: '/waiting-assignment',
+  getParentRoute: () => KioskRoute,
+} as any)
 const KioskPrintCountRoute = KioskPrintCountRouteImport.update({
   id: '/print-count',
   path: '/print-count',
@@ -137,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/photo-session': typeof KioskPhotoSessionRoute
   '/preview': typeof KioskPreviewRoute
   '/print-count': typeof KioskPrintCountRoute
+  '/waiting-assignment': typeof KioskWaitingAssignmentRoute
   '/admin': typeof LayoutAdminRoute
   '/items': typeof LayoutItemsRoute
   '/photobooth-booths': typeof LayoutPhotoboothBoothsRoute
@@ -156,6 +163,7 @@ export interface FileRoutesByTo {
   '/photo-session': typeof KioskPhotoSessionRoute
   '/preview': typeof KioskPreviewRoute
   '/print-count': typeof KioskPrintCountRoute
+  '/waiting-assignment': typeof KioskWaitingAssignmentRoute
   '/admin': typeof LayoutAdminRoute
   '/items': typeof LayoutItemsRoute
   '/photobooth-booths': typeof LayoutPhotoboothBoothsRoute
@@ -177,6 +185,7 @@ export interface FileRoutesById {
   '/_kiosk/photo-session': typeof KioskPhotoSessionRoute
   '/_kiosk/preview': typeof KioskPreviewRoute
   '/_kiosk/print-count': typeof KioskPrintCountRoute
+  '/_kiosk/waiting-assignment': typeof KioskWaitingAssignmentRoute
   '/_layout/admin': typeof LayoutAdminRoute
   '/_layout/items': typeof LayoutItemsRoute
   '/_layout/photobooth-booths': typeof LayoutPhotoboothBoothsRoute
@@ -199,6 +208,7 @@ export interface FileRouteTypes {
     | '/photo-session'
     | '/preview'
     | '/print-count'
+    | '/waiting-assignment'
     | '/admin'
     | '/items'
     | '/photobooth-booths'
@@ -218,6 +228,7 @@ export interface FileRouteTypes {
     | '/photo-session'
     | '/preview'
     | '/print-count'
+    | '/waiting-assignment'
     | '/admin'
     | '/items'
     | '/photobooth-booths'
@@ -238,6 +249,7 @@ export interface FileRouteTypes {
     | '/_kiosk/photo-session'
     | '/_kiosk/preview'
     | '/_kiosk/print-count'
+    | '/_kiosk/waiting-assignment'
     | '/_layout/admin'
     | '/_layout/items'
     | '/_layout/photobooth-booths'
@@ -349,6 +361,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAdminRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_kiosk/waiting-assignment': {
+      id: '/_kiosk/waiting-assignment'
+      path: '/waiting-assignment'
+      fullPath: '/waiting-assignment'
+      preLoaderRoute: typeof KioskWaitingAssignmentRouteImport
+      parentRoute: typeof KioskRoute
+    }
     '/_kiosk/print-count': {
       id: '/_kiosk/print-count'
       path: '/print-count'
@@ -401,6 +420,7 @@ interface KioskRouteChildren {
   KioskPhotoSessionRoute: typeof KioskPhotoSessionRoute
   KioskPreviewRoute: typeof KioskPreviewRoute
   KioskPrintCountRoute: typeof KioskPrintCountRoute
+  KioskWaitingAssignmentRoute: typeof KioskWaitingAssignmentRoute
 }
 
 const KioskRouteChildren: KioskRouteChildren = {
@@ -410,6 +430,7 @@ const KioskRouteChildren: KioskRouteChildren = {
   KioskPhotoSessionRoute: KioskPhotoSessionRoute,
   KioskPreviewRoute: KioskPreviewRoute,
   KioskPrintCountRoute: KioskPrintCountRoute,
+  KioskWaitingAssignmentRoute: KioskWaitingAssignmentRoute,
 }
 
 const KioskRouteWithChildren = KioskRoute._addFileChildren(KioskRouteChildren)

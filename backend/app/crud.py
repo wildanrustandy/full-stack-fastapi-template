@@ -339,6 +339,22 @@ def get_device_session(*, session: Session, device_id: str) -> DeviceSession | N
     return session.exec(statement).first()
 
 
+def update_device_heartbeat(
+    *, session: Session, device_id: str
+) -> DeviceSession | None:
+    """Update device last heartbeat timestamp."""
+    from datetime import datetime, timezone
+
+    device_session = get_device_session(session=session, device_id=device_id)
+    if not device_session:
+        return None
+    device_session.last_heartbeat = datetime.now(timezone.utc)
+    session.add(device_session)
+    session.commit()
+    session.refresh(device_session)
+    return device_session
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------

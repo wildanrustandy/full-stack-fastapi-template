@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from app.api.routes import (
     admin_photobooth,
     booths,
+    devices,
     items,
     login,
     payments,
@@ -26,6 +27,7 @@ api_router.include_router(payments.router)
 api_router.include_router(photos.router)
 api_router.include_router(admin_photobooth.router)
 api_router.include_router(websocket.router)
+api_router.include_router(devices.router)
 
 
 if settings.ENVIRONMENT == "local":
