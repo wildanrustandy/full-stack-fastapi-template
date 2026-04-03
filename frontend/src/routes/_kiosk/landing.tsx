@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { useEffect, useState } from "react"
 import BoothNameHeader from "@/components/Kiosk/BoothNameHeader"
 
 export const Route = createFileRoute("/_kiosk/landing")({
@@ -24,7 +24,10 @@ function LandingPage() {
   }, [])
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: "var(--k-background)" }}>
+    <div
+      className="relative flex h-full w-full flex-col overflow-hidden"
+      style={{ background: "var(--k-background)" }}
+    >
       {/* Background Images */}
       <div className="absolute inset-0 z-0 flex items-center justify-center">
         <div className="flex flex-wrap justify-center gap-3 p-4 opacity-40">
@@ -37,7 +40,11 @@ function LandingPage() {
                 opacity: currentSlide === index ? 1 : 0.3,
               }}
             >
-              <img src={slide} alt={`Slide ${index + 1}`} className="h-full w-full object-cover" />
+              <img
+                src={slide}
+                alt={`Slide ${index + 1}`}
+                className="h-full w-full object-cover"
+              />
             </div>
           ))}
         </div>
@@ -45,24 +52,61 @@ function LandingPage() {
 
       {/* Overlay Effects */}
       <div className="bg-grain pointer-events-none absolute inset-0 z-[1]" />
-      <div className="pointer-events-none absolute inset-0 z-[1]" style={{ background: "linear-gradient(to bottom, rgba(237,248,255,0.2), transparent, rgba(237,248,255,0.8))" }} />
+      <div
+        className="pointer-events-none absolute inset-0 z-[1]"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(237,248,255,0.2), transparent, rgba(237,248,255,0.8))",
+        }}
+      />
 
       {/* Decorative Icons */}
       <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
-        <span className="material-symbols-outlined absolute left-1/4 top-1/4 text-3xl opacity-40 lg:text-4xl" style={{ color: "var(--k-primary)" }}>auto_awesome</span>
-        <span className="material-symbols-outlined absolute bottom-1/3 right-1/4 text-4xl opacity-30 lg:text-5xl" style={{ color: "var(--k-secondary)" }}>favorite</span>
-        <span className="material-symbols-outlined absolute right-10 top-1/3 text-2xl opacity-50 lg:text-3xl" style={{ color: "var(--k-primary-container)" }}>stars</span>
-        <span className="material-symbols-outlined absolute bottom-16 left-10 text-5xl opacity-40 lg:text-6xl" style={{ color: "var(--k-tertiary)" }}>celebration</span>
+        <span
+          className="material-symbols-outlined absolute left-1/4 top-1/4 text-3xl opacity-40 lg:text-4xl"
+          style={{ color: "var(--k-primary)" }}
+        >
+          auto_awesome
+        </span>
+        <span
+          className="material-symbols-outlined absolute bottom-1/3 right-1/4 text-4xl opacity-30 lg:text-5xl"
+          style={{ color: "var(--k-secondary)" }}
+        >
+          favorite
+        </span>
+        <span
+          className="material-symbols-outlined absolute right-10 top-1/3 text-2xl opacity-50 lg:text-3xl"
+          style={{ color: "var(--k-primary-container)" }}
+        >
+          stars
+        </span>
+        <span
+          className="material-symbols-outlined absolute bottom-16 left-10 text-5xl opacity-40 lg:text-6xl"
+          style={{ color: "var(--k-tertiary)" }}
+        >
+          celebration
+        </span>
       </div>
 
       {/* Header */}
-      <header className="relative z-50 flex flex-none items-center justify-between px-6 py-4 backdrop-blur-sm lg:px-8 lg:py-6" style={{ background: "rgba(237,248,255,0.8)" }}>
+      <header
+        className="relative z-50 flex flex-none items-center justify-between px-6 py-4 backdrop-blur-sm lg:px-8 lg:py-6"
+        style={{ background: "rgba(237,248,255,0.8)" }}
+      >
         <BoothNameHeader />
         <div className="flex items-center gap-2 lg:gap-4">
-          <button className="text-xl font-medium transition-transform duration-300 hover:scale-105 lg:text-2xl" style={{ color: "rgba(36,48,54,0.6)" }}>
+          <button
+            type="button"
+            className="text-xl font-medium transition-transform duration-300 hover:scale-105 lg:text-2xl"
+            style={{ color: "rgba(36,48,54,0.6)" }}
+          >
             <span className="material-symbols-outlined">help</span>
           </button>
-          <button className="text-xl font-medium transition-transform duration-300 hover:scale-105 lg:text-2xl" style={{ color: "rgba(36,48,54,0.6)" }}>
+          <button
+            type="button"
+            className="text-xl font-medium transition-transform duration-300 hover:scale-105 lg:text-2xl"
+            style={{ color: "rgba(36,48,54,0.6)" }}
+          >
             <span className="material-symbols-outlined">settings</span>
           </button>
         </div>
@@ -78,7 +122,10 @@ function LandingPage() {
             >
               Photobooth
             </h2>
-            <p className="mx-auto max-w-md text-sm font-medium sm:text-base md:text-lg lg:text-xl" style={{ color: "var(--k-on-surface-variant)" }}>
+            <p
+              className="mx-auto max-w-md text-sm font-medium sm:text-base md:text-lg lg:text-xl"
+              style={{ color: "var(--k-on-surface-variant)" }}
+            >
               Siap untuk pose terbaikmu? Ayo buat momen seru hari ini!
             </p>
           </div>
@@ -86,12 +133,17 @@ function LandingPage() {
           <div className="relative group">
             <div
               className="absolute -inset-3 rounded-full opacity-30 blur-xl transition-opacity duration-500 group-hover:opacity-50 lg:-inset-4 lg:blur-2xl"
-              style={{ background: "linear-gradient(to right, var(--k-primary), var(--k-primary-container))" }}
+              style={{
+                background:
+                  "linear-gradient(to right, var(--k-primary), var(--k-primary-container))",
+              }}
             />
             <button
+              type="button"
               className="font-headline relative rounded-full px-10 py-5 text-xl font-extrabold tracking-widest shadow-[0_20px_40px_rgba(167,41,90,0.25)] transition-all duration-300 hover:scale-105 active:scale-95 sm:px-12 sm:text-2xl sm:py-6 md:px-16 md:text-3xl md:py-7 lg:px-20 lg:text-4xl lg:py-8"
               style={{
-                background: "linear-gradient(to right, var(--k-primary), var(--k-primary-container))",
+                background:
+                  "linear-gradient(to right, var(--k-primary), var(--k-primary-container))",
                 color: "var(--k-on-primary)",
               }}
               onClick={() => navigate({ to: "/print-count" })}
@@ -101,12 +153,33 @@ function LandingPage() {
           </div>
 
           <div className="flex rotate-2 items-center gap-3 rounded-xl border border-white/40 bg-white/60 p-3 shadow-lg backdrop-blur-xl lg:gap-4 lg:p-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2" style={{ borderColor: "rgba(167,41,90,0.2)", background: "var(--k-surface-container)" }}>
-              <span className="material-symbols-outlined text-2xl lg:text-3xl" style={{ color: "var(--k-primary)" }}>photo_camera</span>
+            <div
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2"
+              style={{
+                borderColor: "rgba(167,41,90,0.2)",
+                background: "var(--k-surface-container)",
+              }}
+            >
+              <span
+                className="material-symbols-outlined text-2xl lg:text-3xl"
+                style={{ color: "var(--k-primary)" }}
+              >
+                photo_camera
+              </span>
             </div>
             <div className="text-left">
-              <p className="font-headline text-xs font-bold lg:text-sm" style={{ color: "var(--k-on-surface)" }}>Update Terbaru!</p>
-              <p className="text-[10px] lg:text-xs" style={{ color: "var(--k-on-surface-variant)" }}>Filter Rose Glow baru saja ditambahkan</p>
+              <p
+                className="font-headline text-xs font-bold lg:text-sm"
+                style={{ color: "var(--k-on-surface)" }}
+              >
+                Update Terbaru!
+              </p>
+              <p
+                className="text-[10px] lg:text-xs"
+                style={{ color: "var(--k-on-surface-variant)" }}
+              >
+                Filter Rose Glow baru saja ditambahkan
+              </p>
             </div>
           </div>
         </div>

@@ -24,7 +24,10 @@ export interface DeviceAssignmentCheck {
 }
 
 export const DevicesService = {
-  async registerDevice(deviceId: string, deviceName?: string): Promise<DeviceSession> {
+  async registerDevice(
+    deviceId: string,
+    deviceName?: string,
+  ): Promise<DeviceSession> {
     const response = await fetch(`${API_BASE}/api/v1/devices/register`, {
       method: "POST",
       headers: {
@@ -35,36 +38,41 @@ export const DevicesService = {
         device_name: deviceName || "Kiosk",
       }),
     })
-    
+
     if (!response.ok) {
       throw new Error(`Failed to register device: ${response.status}`)
     }
-    
+
     return response.json()
   },
 
   async checkAssignment(deviceId: string): Promise<DeviceAssignmentCheck> {
-    const response = await fetch(`${API_BASE}/api/v1/devices/check-assignment/${deviceId}`)
-    
+    const response = await fetch(
+      `${API_BASE}/api/v1/devices/check-assignment/${deviceId}`,
+    )
+
     if (!response.ok) {
       throw new Error(`Failed to check assignment: ${response.status}`)
     }
-    
+
     return response.json()
   },
 
   async sendHeartbeat(deviceId: string): Promise<DeviceSession> {
-    const response = await fetch(`${API_BASE}/api/v1/devices/${deviceId}/heartbeat`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `${API_BASE}/api/v1/devices/${deviceId}/heartbeat`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    })
-    
+    )
+
     if (!response.ok) {
       throw new Error(`Failed to send heartbeat: ${response.status}`)
     }
-    
+
     return response.json()
   },
 
@@ -74,18 +82,18 @@ export const DevicesService = {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         pin,
         booth_id: boothId,
       }),
     })
-    
+
     if (!response.ok) {
       throw new Error(`Failed to assign device: ${response.status}`)
     }
-    
+
     return response.json()
   },
 }

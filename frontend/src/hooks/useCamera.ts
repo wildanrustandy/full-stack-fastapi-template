@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 interface UseCameraOptions {
   width?: number
@@ -27,7 +27,11 @@ const useCamera = (options: UseCameraOptions = {}) => {
     try {
       setError(null)
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: { ideal: width }, height: { ideal: height }, facingMode },
+        video: {
+          width: { ideal: width },
+          height: { ideal: height },
+          facingMode,
+        },
         audio: false,
       })
       streamRef.current = stream
@@ -37,7 +41,8 @@ const useCamera = (options: UseCameraOptions = {}) => {
       }
       setIsReady(true)
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Camera access denied"
+      const message =
+        err instanceof Error ? err.message : "Camera access denied"
       setError(message)
       setIsReady(false)
     }
@@ -45,7 +50,9 @@ const useCamera = (options: UseCameraOptions = {}) => {
 
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop())
+      for (const track of streamRef.current.getTracks()) {
+        track.stop()
+      }
       streamRef.current = null
     }
     if (videoRef.current) {

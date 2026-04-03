@@ -339,6 +339,88 @@ export const BoothsPublicSchema = {
     title: 'BoothsPublic'
 } as const;
 
+export const DeviceSessionPublicSchema = {
+    properties: {
+        device_id: {
+            type: 'string',
+            maxLength: 255,
+            title: 'Device Id'
+        },
+        device_name: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 255
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Device Name'
+        },
+        id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Id'
+        },
+        booth_id: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'uuid'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Booth Id'
+        },
+        pin: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Pin'
+        },
+        is_active: {
+            type: 'boolean',
+            title: 'Is Active',
+            default: true
+        },
+        connected_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Connected At'
+        },
+        last_heartbeat: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Last Heartbeat'
+        }
+    },
+    type: 'object',
+    required: ['device_id', 'id'],
+    title: 'DeviceSessionPublic'
+} as const;
+
 export const HTTPValidationErrorSchema = {
     properties: {
         detail: {
@@ -723,6 +805,102 @@ export const PaymentRequestBodySchema = {
     type: 'object',
     required: ['amount', 'booth_id'],
     title: 'PaymentRequestBody'
+} as const;
+
+export const PhotoPublicSchema = {
+    properties: {
+        file_url: {
+            type: 'string',
+            minLength: 1,
+            title: 'File Url'
+        },
+        order: {
+            type: 'integer',
+            maximum: 4,
+            minimum: 1,
+            title: 'Order'
+        },
+        id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Id'
+        },
+        session_id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Session Id'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        }
+    },
+    type: 'object',
+    required: ['file_url', 'order', 'id', 'session_id'],
+    title: 'PhotoPublic'
+} as const;
+
+export const PhotoUploadBodySchema = {
+    properties: {
+        session_id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Session Id'
+        },
+        photos: {
+            items: {
+                '$ref': '#/components/schemas/PhotoUploadItem'
+            },
+            type: 'array',
+            title: 'Photos'
+        }
+    },
+    type: 'object',
+    required: ['session_id', 'photos'],
+    title: 'PhotoUploadBody'
+} as const;
+
+export const PhotoUploadItemSchema = {
+    properties: {
+        data_url: {
+            type: 'string',
+            title: 'Data Url'
+        },
+        order: {
+            type: 'integer',
+            title: 'Order'
+        }
+    },
+    type: 'object',
+    required: ['data_url', 'order'],
+    title: 'PhotoUploadItem'
+} as const;
+
+export const PhotosPublicSchema = {
+    properties: {
+        data: {
+            items: {
+                '$ref': '#/components/schemas/PhotoPublic'
+            },
+            type: 'array',
+            title: 'Data'
+        },
+        count: {
+            type: 'integer',
+            title: 'Count'
+        }
+    },
+    type: 'object',
+    required: ['data', 'count'],
+    title: 'PhotosPublic'
 } as const;
 
 export const PrivateUserCreateSchema = {

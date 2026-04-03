@@ -3,7 +3,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { BoothsReadBoothsData, BoothsReadBoothsResponse, BoothsCreateBoothData, BoothsCreateBoothResponse, BoothsReadBoothData, BoothsReadBoothResponse, BoothsUpdateBoothData, BoothsUpdateBoothResponse, BoothsDeleteBoothData, BoothsDeleteBoothResponse, BoothsUpdateBoothConfigData, BoothsUpdateBoothConfigResponse, BoothsAssignDeviceData, BoothsAssignDeviceResponse, BoothsUnassignDeviceData, BoothsUnassignDeviceResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PaymentsCreatePaymentData, PaymentsCreatePaymentResponse, PaymentsCheckStatusData, PaymentsCheckStatusResponse, PaymentsPaymentNotifyResponse, PaymentsPaymentNotifyTestData, PaymentsPaymentNotifyTestResponse, PaymentsCreateDemoPaymentData, PaymentsCreateDemoPaymentResponse, PhotoboothAdminGetDashboardOverviewResponse, PhotoboothAdminGetRecentTransactionsData, PhotoboothAdminGetRecentTransactionsResponse, PhotoboothAdminGetActiveSessionsResponse, PhotoboothAdminGetRecentSessionsData, PhotoboothAdminGetRecentSessionsResponse, PhotoboothAdminGetTransactionsData, PhotoboothAdminGetTransactionsResponse, PhotoboothAdminGetRevenueReportData, PhotoboothAdminGetRevenueReportResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
+import type { BoothsReadBoothsData, BoothsReadBoothsResponse, BoothsCreateBoothData, BoothsCreateBoothResponse, BoothsReadBoothData, BoothsReadBoothResponse, BoothsUpdateBoothData, BoothsUpdateBoothResponse, BoothsDeleteBoothData, BoothsDeleteBoothResponse, BoothsUpdateBoothConfigData, BoothsUpdateBoothConfigResponse, BoothsAssignDeviceData, BoothsAssignDeviceResponse, BoothsUnassignDeviceData, BoothsUnassignDeviceResponse, DevicesRegisterDeviceData, DevicesRegisterDeviceResponse, DevicesCheckDeviceAssignmentData, DevicesCheckDeviceAssignmentResponse, DevicesDeviceHeartbeatData, DevicesDeviceHeartbeatResponse, DevicesAssignDeviceByPinData, DevicesAssignDeviceByPinResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PaymentsCreatePaymentData, PaymentsCreatePaymentResponse, PaymentsCheckStatusData, PaymentsCheckStatusResponse, PaymentsPaymentNotifyResponse, PaymentsPaymentNotifyTestData, PaymentsPaymentNotifyTestResponse, PaymentsCreateDemoPaymentData, PaymentsCreateDemoPaymentResponse, PhotoboothAdminGetDashboardOverviewResponse, PhotoboothAdminGetRecentTransactionsData, PhotoboothAdminGetRecentTransactionsResponse, PhotoboothAdminGetActiveSessionsResponse, PhotoboothAdminGetRecentSessionsData, PhotoboothAdminGetRecentSessionsResponse, PhotoboothAdminGetTransactionsData, PhotoboothAdminGetTransactionsResponse, PhotoboothAdminGetRevenueReportData, PhotoboothAdminGetRevenueReportResponse, PhotosUploadPhotosData, PhotosUploadPhotosResponse, PhotosGetPhotosBySessionData, PhotosGetPhotosBySessionResponse, PhotosGetPhotoData, PhotosGetPhotoResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
 
 export class BoothsService {
     /**
@@ -178,6 +178,94 @@ export class BoothsService {
             path: {
                 id: data.id
             },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
+
+export class DevicesService {
+    /**
+     * Register Device
+     * Register a new device or return existing device session.
+     * This is called from the kiosk when it first loads.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns DeviceSessionPublic Successful Response
+     * @throws ApiError
+     */
+    public static registerDevice(data: DevicesRegisterDeviceData): CancelablePromise<DevicesRegisterDeviceResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/devices/register',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Check Device Assignment
+     * Check if a device is assigned to a booth.
+     * Returns booth info if assigned, or null booth_id if not.
+     * @param data The data for the request.
+     * @param data.deviceId
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static checkDeviceAssignment(data: DevicesCheckDeviceAssignmentData): CancelablePromise<DevicesCheckDeviceAssignmentResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/devices/check-assignment/{device_id}',
+            path: {
+                device_id: data.deviceId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Device Heartbeat
+     * Update device last heartbeat timestamp.
+     * Called periodically by the kiosk to show it's still active.
+     * @param data The data for the request.
+     * @param data.deviceId
+     * @returns DeviceSessionPublic Successful Response
+     * @throws ApiError
+     */
+    public static deviceHeartbeat(data: DevicesDeviceHeartbeatData): CancelablePromise<DevicesDeviceHeartbeatResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/devices/{device_id}/heartbeat',
+            path: {
+                device_id: data.deviceId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Assign Device By Pin
+     * Assign a device to a booth using its 6-digit PIN.
+     * This is more user-friendly than entering the full device ID.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns BoothPublic Successful Response
+     * @throws ApiError
+     */
+    public static assignDeviceByPin(data: DevicesAssignDeviceByPinData): CancelablePromise<DevicesAssignDeviceByPinResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/devices/assign-by-pin',
+            body: data.requestBody,
+            mediaType: 'application/json',
             errors: {
                 422: 'Validation Error'
             }
@@ -604,6 +692,70 @@ export class PhotoboothAdminService {
             query: {
                 start_date: data.startDate,
                 end_date: data.endDate
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
+
+export class PhotosService {
+    /**
+     * Upload Photos
+     * Upload multiple photos for a session and mark the session as completed.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns PhotosPublic Successful Response
+     * @throws ApiError
+     */
+    public static uploadPhotos(data: PhotosUploadPhotosData): CancelablePromise<PhotosUploadPhotosResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/photos/upload',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Photos By Session
+     * Get all photos for a given session, ordered by `order`.
+     * @param data The data for the request.
+     * @param data.sessionId
+     * @returns PhotosPublic Successful Response
+     * @throws ApiError
+     */
+    public static getPhotosBySession(data: PhotosGetPhotosBySessionData): CancelablePromise<PhotosGetPhotosBySessionResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/photos/session/{session_id}',
+            path: {
+                session_id: data.sessionId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Photo
+     * Get a single photo by its ID.
+     * @param data The data for the request.
+     * @param data.photoId
+     * @returns PhotoPublic Successful Response
+     * @throws ApiError
+     */
+    public static getPhoto(data: PhotosGetPhotoData): CancelablePromise<PhotosGetPhotoResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/photos/{photo_id}',
+            path: {
+                photo_id: data.photoId
             },
             errors: {
                 422: 'Validation Error'

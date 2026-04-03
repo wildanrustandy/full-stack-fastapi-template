@@ -27,8 +27,8 @@ export function useKioskDevice() {
       let existingId = localStorage.getItem(STORAGE_KEY)
       if (!existingId) {
         const random = Array.from(crypto.getRandomValues(new Uint8Array(16)))
-          .map(b => b.toString(36).padStart(2, '0'))
-          .join('')
+          .map((b) => b.toString(36).padStart(2, "0"))
+          .join("")
           .slice(0, 22)
         existingId = `dev_${random}`
         localStorage.setItem(STORAGE_KEY, existingId)
@@ -91,7 +91,11 @@ export function useKioskDevice() {
     if (!deviceId) return
 
     // Use existing connection if available for same device
-    if (globalWs && globalWs.readyState === WebSocket.OPEN && globalDeviceId === deviceId) {
+    if (
+      globalWs &&
+      globalWs.readyState === WebSocket.OPEN &&
+      globalDeviceId === deviceId
+    ) {
       return
     }
 
@@ -101,7 +105,10 @@ export function useKioskDevice() {
       globalWs = null
     }
 
-    const wsUrl = API_BASE.replace("http://", "ws://").replace("https://", "wss://")
+    const wsUrl = API_BASE.replace("http://", "ws://").replace(
+      "https://",
+      "wss://",
+    )
     const ws = new WebSocket(`${wsUrl}/api/v1/ws/device/${deviceId}`)
     globalWs = ws
     globalDeviceId = deviceId
@@ -117,8 +124,13 @@ export function useKioskDevice() {
         setLastMessage(data)
 
         if (data.type === "assigned") {
-          console.log("Kiosk assigned to booth:", data.booth_name, "active:", data.booth_active)
-          setWsUnassigned(false)  // Reset the WebSocket unassigned flag
+          console.log(
+            "Kiosk assigned to booth:",
+            data.booth_name,
+            "active:",
+            data.booth_active,
+          )
+          setWsUnassigned(false) // Reset the WebSocket unassigned flag
           if (data.booth_active === false) {
             // Assigned to inactive booth - show inactive overlay
             setIsAssigned(false)
@@ -190,10 +202,10 @@ export function useKioskDevice() {
     const interval = setInterval(async () => {
       // Skip polling if we were unassigned via WebSocket
       if (wsUnassigned) return
-      
+
       try {
         const result = await DevicesService.checkAssignment(deviceId)
-        
+
         if (result.is_assigned && result.booth_id) {
           setIsAssigned(true)
           setBooth({

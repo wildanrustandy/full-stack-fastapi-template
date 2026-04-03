@@ -53,7 +53,8 @@ const useRecentSessions = (limit: number = 20) => {
 const useRevenueReport = (startDate: string, endDate: string) => {
   return useQuery({
     queryKey: ["photobooth", "reports", "revenue", startDate, endDate],
-    queryFn: () => PhotoboothAdminService.getRevenueReport({ startDate, endDate }),
+    queryFn: () =>
+      PhotoboothAdminService.getRevenueReport({ startDate, endDate }),
     enabled: !!startDate && !!endDate,
   })
 }
@@ -62,8 +63,12 @@ const useRevenueReport = (startDate: string, endDate: string) => {
 const useCreatePayment = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: { amount: string; booth_id: string; print_count: number; product_name?: string }) =>
-      PaymentsService.createPayment({ requestBody: data as any }),
+    mutationFn: (data: {
+      amount: string
+      booth_id: string
+      print_count: number
+      product_name?: string
+    }) => PaymentsService.createPayment({ requestBody: data as any }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["photobooth"] })
     },
@@ -73,8 +78,12 @@ const useCreatePayment = () => {
 const useCreateDemoPayment = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: { amount: string; booth_id: string; print_count: number; product_name?: string }) =>
-      PaymentsService.createDemoPayment({ requestBody: data as any }),
+    mutationFn: (data: {
+      amount: string
+      booth_id: string
+      print_count: number
+      product_name?: string
+    }) => PaymentsService.createDemoPayment({ requestBody: data as any }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["photobooth"] })
     },
@@ -94,8 +103,11 @@ const useCheckPaymentStatus = (transactionId: string) => {
 const useCreateBooth = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: { name: string; location?: string; config?: Record<string, unknown> }) =>
-      BoothsService.createBooth({ requestBody: data as any }),
+    mutationFn: (data: {
+      name: string
+      location?: string
+      config?: Record<string, unknown>
+    }) => BoothsService.createBooth({ requestBody: data as any }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["booths"] })
     },
@@ -105,12 +117,28 @@ const useCreateBooth = () => {
 const useUpdateBooth = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: async ({ id, config, ...data }: { id: string; name?: string; location?: string; is_active?: boolean; config?: Record<string, unknown> }) => {
+    mutationFn: async ({
+      id,
+      config,
+      ...data
+    }: {
+      id: string
+      name?: string
+      location?: string
+      is_active?: boolean
+      config?: Record<string, unknown>
+    }) => {
       // Update basic booth info
-      const booth = await BoothsService.updateBooth({ id, requestBody: data as any })
+      const booth = await BoothsService.updateBooth({
+        id,
+        requestBody: data as any,
+      })
       // Update config if provided
       if (config) {
-        const updatedBooth = await BoothsService.updateBoothConfig({ id, requestBody: config as any })
+        const updatedBooth = await BoothsService.updateBoothConfig({
+          id,
+          requestBody: config as any,
+        })
         return updatedBooth
       }
       return booth
@@ -134,7 +162,8 @@ const useDeleteBooth = () => {
 const useUnassignDevice = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (boothId: string) => BoothsService.unassignDevice({ id: boothId }),
+    mutationFn: (boothId: string) =>
+      BoothsService.unassignDevice({ id: boothId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["booths"] })
     },

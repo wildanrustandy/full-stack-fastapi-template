@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react"
 import { useQueryClient } from "@tanstack/react-query"
+import { useEffect, useRef } from "react"
 
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000"
 
@@ -15,7 +15,10 @@ export function useAdminWebSocket() {
       return
     }
 
-    const wsUrl = API_BASE.replace("http://", "ws://").replace("https://", "wss://")
+    const wsUrl = API_BASE.replace("http://", "ws://").replace(
+      "https://",
+      "wss://",
+    )
     console.log("Admin WebSocket: Connecting to", `${wsUrl}/api/v1/ws/admin`)
     const ws = new WebSocket(`${wsUrl}/api/v1/ws/admin`)
     wsRef.current = ws

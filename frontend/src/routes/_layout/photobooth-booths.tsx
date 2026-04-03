@@ -1,18 +1,30 @@
 import { createFileRoute, redirect } from "@tanstack/react-router"
+import { MapPin, Monitor, Plus, Settings, Trash2, X } from "lucide-react"
 import { Suspense, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { useBooths, useCreateBooth, useDeleteBooth, useUnassignDevice } from "@/hooks/usePhotobooth"
+import { UsersService } from "@/client"
 import { AssignDeviceByPinDialog } from "@/components/Booths/AssignDeviceByPinDialog"
 import { EditBoothDialog } from "@/components/Booths/EditBoothDialog"
-import useCustomToast from "@/hooks/useCustomToast"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { useAdminWebSocket } from "@/hooks/useAdminWebSocket"
-import { UsersService } from "@/client"
-import { Plus, Trash2, MapPin, Settings, Monitor, X } from "lucide-react"
+import useCustomToast from "@/hooks/useCustomToast"
+import {
+  useBooths,
+  useCreateBooth,
+  useDeleteBooth,
+  useUnassignDevice,
+} from "@/hooks/usePhotobooth"
 
 export const Route = createFileRoute("/_layout/photobooth-booths")({
   component: PhotoboothBooths,
@@ -34,7 +46,7 @@ function BoothCard({ booth }: { booth: any }) {
     try {
       await deleteBooth.mutateAsync(booth.id)
       showSuccessToast("Booth deleted")
-    } catch (error) {
+    } catch (_error) {
       showErrorToast("Failed to delete booth")
     }
   }
@@ -43,7 +55,7 @@ function BoothCard({ booth }: { booth: any }) {
     try {
       await unassignDevice.mutateAsync(booth.id)
       showSuccessToast("Device unassigned")
-    } catch (error) {
+    } catch (_error) {
       showErrorToast("Failed to unassign device")
     }
   }
@@ -71,25 +83,27 @@ function BoothCard({ booth }: { booth: any }) {
           <MapPin className="h-4 w-4" />
           {booth.location || "No location"}
         </div>
-        
+
         <div className="mt-2 text-sm">
           <span className="text-muted-foreground">Price: </span>
-          <span className="font-medium">Rp {price.toLocaleString('id-ID')}</span>
+          <span className="font-medium">
+            Rp {price.toLocaleString("id-ID")}
+          </span>
         </div>
-        
+
         {/* Device Assignment Section */}
         <div className="mt-4 pt-4 border-t">
           <div className="flex items-center gap-2 mb-2">
             <Monitor className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm font-medium">Device</span>
           </div>
-          
+
           {booth.device_id ? (
             <div className="flex items-center justify-between bg-muted rounded-md p-2">
               <code className="text-xs">{booth.device_id}</code>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleUnassign}
                 disabled={unassignDevice.isPending}
               >
@@ -97,8 +111,8 @@ function BoothCard({ booth }: { booth: any }) {
               </Button>
             </div>
           ) : (
-            <AssignDeviceByPinDialog 
-              boothId={booth.id} 
+            <AssignDeviceByPinDialog
+              boothId={booth.id}
               boothName={booth.name}
             />
           )}
@@ -111,7 +125,7 @@ function BoothCard({ booth }: { booth: any }) {
 function BoothsContent() {
   // Connect to admin WebSocket for real-time updates
   useAdminWebSocket()
-  
+
   const { data: boothsData } = useBooths()
   const createBooth = useCreateBooth()
   const { showSuccessToast } = useCustomToast()
@@ -134,11 +148,15 @@ function BoothsContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Booths</h1>
-          <p className="text-muted-foreground">Manage your photobooth locations and assign devices</p>
+          <p className="text-muted-foreground">
+            Manage your photobooth locations and assign devices
+          </p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button><Plus className="mr-2 h-4 w-4" /> Add Booth</Button>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" /> Add Booth
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -147,15 +165,28 @@ function BoothsContent() {
             <div className="grid gap-4 py-4">
               <div className="grid gap-2">
                 <Label htmlFor="name">Name</Label>
-                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Booth name" />
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Booth name"
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="location">Location</Label>
-                <Input id="location" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Mall A, Floor 3" />
+                <Input
+                  id="location"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="e.g. Mall A, Floor 3"
+                />
               </div>
             </div>
             <DialogFooter>
-              <Button onClick={handleCreate} disabled={!name || createBooth.isPending}>
+              <Button
+                onClick={handleCreate}
+                disabled={!name || createBooth.isPending}
+              >
                 {createBooth.isPending ? "Creating..." : "Create"}
               </Button>
             </DialogFooter>
@@ -164,9 +195,10 @@ function BoothsContent() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {Array.isArray(booths) && booths.map((booth: any) => (
-          <BoothCard key={booth.id} booth={booth} />
-        ))}
+        {Array.isArray(booths) &&
+          booths.map((booth: any) => (
+            <BoothCard key={booth.id} booth={booth} />
+          ))}
       </div>
 
       {(!Array.isArray(booths) || booths.length === 0) && (

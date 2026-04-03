@@ -4,16 +4,16 @@ from typing import Any
 
 from fastapi import APIRouter, Query
 from sqlalchemy import func
-from sqlmodel import select, col
+from sqlmodel import col, select
 
-from app.api.deps import CurrentUserSuperUser, SessionDep
 from app import crud
+from app.api.deps import CurrentUserSuperUser, SessionDep
 from app.models import (
+    Booth,
     KioskSession,
     KioskSessionPublic,
     Payment,
     PaymentPublic,
-    Booth,
 )
 
 router = APIRouter(prefix="/photobooth", tags=["photobooth-admin"])
@@ -22,7 +22,7 @@ router = APIRouter(prefix="/photobooth", tags=["photobooth-admin"])
 @router.get("/dashboard/overview")
 def get_dashboard_overview(
     session: SessionDep,
-    current_user: CurrentUserSuperUser,
+    _current_user: CurrentUserSuperUser,
 ) -> dict[str, Any]:
     """Get dashboard overview stats (superuser only)."""
 
@@ -48,7 +48,7 @@ def get_dashboard_overview(
     today_sessions = session.exec(
         select(func.count())
         .select_from(KioskSession)
-        .where(KioskSession.created_at >= today_start)
+        .where(col(KioskSession.created_at) >= today_start)
     ).one()
 
     return {
@@ -62,7 +62,7 @@ def get_dashboard_overview(
 @router.get("/dashboard/recent-transactions")
 def get_recent_transactions(
     session: SessionDep,
-    current_user: CurrentUserSuperUser,
+    _current_user: CurrentUserSuperUser,
     limit: int = Query(default=10, ge=1, le=100),
 ) -> list[PaymentPublic]:
     """Get recent transactions (superuser only)."""
@@ -73,12 +73,12 @@ def get_recent_transactions(
 @router.get("/sessions/active")
 def get_active_sessions(
     session: SessionDep,
-    current_user: CurrentUserSuperUser,
+    _current_user: CurrentUserSuperUser,
 ) -> list[KioskSessionPublic]:
     """Get active sessions with status 'pending' or 'paid' (superuser only)."""
     statement = (
         select(KioskSession)
-        .where(KioskSession.status.in_(["pending", "paid"]))
+        .where(col(KioskSession.status).in_(["pending", "paid"]))  # type: ignore[union-attr]
         .order_by(col(KioskSession.created_at).desc())
     )
     results = session.exec(statement).all()
@@ -88,7 +88,7 @@ def get_active_sessions(
 @router.get("/sessions/recent")
 def get_recent_sessions(
     session: SessionDep,
-    current_user: CurrentUserSuperUser,
+    _current_user: CurrentUserSuperUser,
     limit: int = Query(default=20, ge=1, le=100),
 ) -> list[KioskSessionPublic]:
     """Get recent sessions ordered by created_at descending (superuser only)."""
@@ -102,7 +102,7 @@ def get_recent_sessions(
 @router.get("/transactions")
 def get_transactions(
     session: SessionDep,
-    current_user: CurrentUserSuperUser,
+    _current_user: CurrentUserSuperUser,
     booth_id: uuid.UUID | None = None,
     status: str | None = None,
     start_date: datetime | None = None,
@@ -127,7 +127,7 @@ def get_transactions(
 @router.get("/reports/revenue")
 def get_revenue_report(
     session: SessionDep,
-    current_user: CurrentUserSuperUser,
+    _current_user: CurrentUserSuperUser,
     start_date: datetime = Query(..., description="Start date for the report"),
     end_date: datetime = Query(..., description="End date for the report"),
 ) -> list[dict[str, Any]]:
@@ -139,17 +139,17 @@ def get_revenue_report(
             func.coalesce(func.sum(Payment.amount), 0).label("revenue"),
         )
         .where(Payment.status == "success")
-        .where(Payment.created_at >= start_date)
-        .where(Payment.created_at <= end_date)
+        .where(col(Payment.created_at) >= start_date)
+        .where(col(Payment.created_at) <= end_date)
         .group_by(func.date(Payment.created_at))
         .order_by(func.date(Payment.created_at))
     )
     results = session.exec(statement).all()
     return [
         {
-            "date": str(row.date),
-            "count": row.count,
-            "revenue": float(row.revenue),
+            "date": str(row[0]),
+            "count": row[1],
+            "revenue": float(row[2]),
         }
         for row in results
     ]

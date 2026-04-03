@@ -2,10 +2,10 @@ import uuid
 from typing import Any
 
 from fastapi import APIRouter, HTTPException
-from sqlmodel import SQLModel, select
+from sqlmodel import SQLModel
 
-from app.api.deps import SessionDep
 from app import crud
+from app.api.deps import SessionDep
 from app.models import (
     KioskSessionUpdate,
     Photo,

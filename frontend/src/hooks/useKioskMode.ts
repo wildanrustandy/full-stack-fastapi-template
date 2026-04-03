@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, useCallback } from "react"
 import { useNavigate } from "@tanstack/react-router"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 const DEFAULT_IDLE_TIMEOUT = 120_000 // 2 minutes
 
@@ -37,7 +37,13 @@ export default function useKioskMode(options?: UseKioskModeOptions) {
   }, [idleTimeout, resetToLanding])
 
   useEffect(() => {
-    const events = ["mousemove", "mousedown", "touchstart", "click", "keydown"] as const
+    const events = [
+      "mousemove",
+      "mousedown",
+      "touchstart",
+      "click",
+      "keydown",
+    ] as const
 
     const handler = () => {
       resetTimer()
@@ -91,9 +97,11 @@ export default function useKioskMode(options?: UseKioskModeOptions) {
       }
 
       if (typeof el.requestFullscreen === "function") {
-        el.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {
-          // Fullscreen request denied or unavailable
-        })
+        el.requestFullscreen()
+          .then(() => setIsFullscreen(true))
+          .catch(() => {
+            // Fullscreen request denied or unavailable
+          })
       } else if (typeof el.webkitRequestFullscreen === "function") {
         el.webkitRequestFullscreen()
         setIsFullscreen(true)

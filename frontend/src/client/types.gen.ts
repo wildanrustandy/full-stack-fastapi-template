@@ -56,6 +56,17 @@ export type BoothUpdate = {
     is_active?: (boolean | null);
 };
 
+export type DeviceSessionPublic = {
+    device_id: string;
+    device_name?: (string | null);
+    id: string;
+    booth_id?: (string | null);
+    pin?: (string | null);
+    is_active?: boolean;
+    connected_at?: (string | null);
+    last_heartbeat?: (string | null);
+};
+
 export type HTTPValidationError = {
     detail?: Array<ValidationError>;
 };
@@ -126,6 +137,29 @@ export type PaymentRequestBody = {
     qty?: string;
     booth_id: string;
     print_count?: number;
+};
+
+export type PhotoPublic = {
+    file_url: string;
+    order: number;
+    id: string;
+    session_id: string;
+    created_at?: (string | null);
+};
+
+export type PhotosPublic = {
+    data: Array<PhotoPublic>;
+    count: number;
+};
+
+export type PhotoUploadBody = {
+    session_id: string;
+    photos: Array<PhotoUploadItem>;
+};
+
+export type PhotoUploadItem = {
+    data_url: string;
+    order: number;
 };
 
 export type PrivateUserCreate = {
@@ -247,6 +281,36 @@ export type BoothsUnassignDeviceData = {
 };
 
 export type BoothsUnassignDeviceResponse = (BoothPublic);
+
+export type DevicesRegisterDeviceData = {
+    requestBody: {
+        [key: string]: unknown;
+    };
+};
+
+export type DevicesRegisterDeviceResponse = (DeviceSessionPublic);
+
+export type DevicesCheckDeviceAssignmentData = {
+    deviceId: string;
+};
+
+export type DevicesCheckDeviceAssignmentResponse = ({
+    [key: string]: unknown;
+});
+
+export type DevicesDeviceHeartbeatData = {
+    deviceId: string;
+};
+
+export type DevicesDeviceHeartbeatResponse = (DeviceSessionPublic);
+
+export type DevicesAssignDeviceByPinData = {
+    requestBody: {
+        [key: string]: unknown;
+    };
+};
+
+export type DevicesAssignDeviceByPinResponse = (BoothPublic);
 
 export type ItemsReadItemsData = {
     limit?: number;
@@ -374,6 +438,24 @@ export type PhotoboothAdminGetRevenueReportData = {
 export type PhotoboothAdminGetRevenueReportResponse = (Array<{
     [key: string]: unknown;
 }>);
+
+export type PhotosUploadPhotosData = {
+    requestBody: PhotoUploadBody;
+};
+
+export type PhotosUploadPhotosResponse = (PhotosPublic);
+
+export type PhotosGetPhotosBySessionData = {
+    sessionId: string;
+};
+
+export type PhotosGetPhotosBySessionResponse = (PhotosPublic);
+
+export type PhotosGetPhotoData = {
+    photoId: string;
+};
+
+export type PhotosGetPhotoResponse = (PhotoPublic);
 
 export type PrivateCreateUserData = {
     requestBody: PrivateUserCreate;

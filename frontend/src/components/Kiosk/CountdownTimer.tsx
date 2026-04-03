@@ -3,7 +3,10 @@ interface CountdownTimerProps {
   isWarning: boolean
 }
 
-export default function CountdownTimer({ formattedTime, isWarning }: CountdownTimerProps) {
+export default function CountdownTimer({
+  formattedTime,
+  isWarning,
+}: CountdownTimerProps) {
   return (
     <div className="flex flex-col items-center gap-2">
       <span className="font-label text-xs font-bold uppercase tracking-widest text-[var(--k-on-surface-variant)]">
@@ -14,12 +17,16 @@ export default function CountdownTimer({ formattedTime, isWarning }: CountdownTi
           isWarning ? "animate-pulse" : ""
         }`}
         style={{
-          background: isWarning ? "var(--k-error-container)" : "var(--k-surface-container-lowest)",
+          background: isWarning
+            ? "var(--k-error-container)"
+            : "var(--k-surface-container-lowest)",
           color: isWarning ? "var(--k-error)" : "var(--k-primary)",
         }}
       >
         <span className="material-symbols-outlined text-xl">timer</span>
-        <span className="font-headline text-2xl font-black tracking-tight">{formattedTime}</span>
+        <span className="font-headline text-2xl font-black tracking-tight">
+          {formattedTime}
+        </span>
       </div>
     </div>
   )

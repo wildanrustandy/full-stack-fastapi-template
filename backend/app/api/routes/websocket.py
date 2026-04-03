@@ -1,8 +1,9 @@
-import asyncio
-import json
+import logging
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["websocket"])
 
@@ -14,7 +15,7 @@ admin_connections: list[WebSocket] = []
 @router.websocket("/ws/device/{device_id}")
 async def device_websocket(websocket: WebSocket, device_id: str) -> None:
     await websocket.accept()
-    print(f"DEBUG: WebSocket connected for device: {device_id}")
+    logger.debug("WebSocket connected for device: %s", device_id)
     active_connections[device_id] = websocket
 
     await websocket.send_json(
@@ -128,8 +129,11 @@ async def notify_device_assignment(
     reason: str | None = None,
 ) -> bool:
     """Notify device about assignment/unassignment change."""
-    print(
-        f"DEBUG notify_device_assignment: device_id={device_id}, booth_id={booth_id}, active_connections={list(active_connections.keys())}"
+    logger.debug(
+        "notify_device_assignment: device_id=%s, booth_id=%s, connections=%s",
+        device_id,
+        booth_id,
+        list(active_connections.keys()),
     )
     if device_id in active_connections:
         ws = active_connections[device_id]
@@ -144,7 +148,7 @@ async def notify_device_assignment(
                     "booth_active": booth_active,
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                 }
-                print(f"DEBUG: Sending assigned message: {message}")
+                logger.debug("Sending assigned message to device %s", device_id)
                 await ws.send_json(message)
             else:
                 message = {
@@ -152,13 +156,15 @@ async def notify_device_assignment(
                     "reason": reason or "Device unassigned",
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                 }
-                print(f"DEBUG: Sending unassigned message: {message}")
+                logger.debug("Sending unassigned message to device %s", device_id)
                 await ws.send_json(message)
             return True
         except Exception as e:
-            print(f"DEBUG: Error sending WebSocket message: {e}")
+            logger.error(
+                "Error sending WebSocket message to device %s: %s", device_id, e
+            )
     else:
-        print(f"DEBUG: Device {device_id} not in active_connections")
+        logger.debug("Device %s not in active_connections", device_id)
     return False
 
 
@@ -170,15 +176,14 @@ async def broadcast_booth_update(booth_id: str, action: str = "updated") -> None
         "action": action,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
-    print(
-        f"DEBUG: Broadcasting booth update to {len(admin_connections)} admin connections: {message}"
+    logger.debug(
+        "Broadcasting booth update to %d admin connections", len(admin_connections)
     )
     disconnected = []
     for ws in admin_connections:
         try:
             await ws.send_json(message)
-        except Exception as e:
-            print(f"DEBUG: Error sending to admin: {e}")
+        except Exception:
             disconnected.append(ws)
     for ws in disconnected:
         if ws in admin_connections:

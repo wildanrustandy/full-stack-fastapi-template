@@ -6,9 +6,9 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
 
-from app.api.deps import CurrentUser, SessionDep
 from app import crud
-from app.models import DeviceSession, DeviceSessionPublic, BoothPublic
+from app.api.deps import CurrentUser, SessionDep
+from app.models import BoothPublic, DeviceSession, DeviceSessionPublic
 
 router = APIRouter(prefix="/devices", tags=["devices"])
 

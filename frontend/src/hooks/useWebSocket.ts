@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 interface UseWebSocketOptions {
   onMessage?: (data: any) => void
@@ -9,7 +9,10 @@ interface UseWebSocketOptions {
   reconnectAttempts?: number
 }
 
-const useWebSocket = (url: string | null, options: UseWebSocketOptions = {}) => {
+const useWebSocket = (
+  url: string | null,
+  options: UseWebSocketOptions = {},
+) => {
   const {
     onMessage,
     onOpen,
@@ -19,7 +22,9 @@ const useWebSocket = (url: string | null, options: UseWebSocketOptions = {}) => 
     reconnectAttempts = 10,
   } = options
   const reconnectCountRef = useRef(0)
-  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  )
   const [lastMessage, setLastMessage] = useState<any>(null)
   const wsRef = useRef<WebSocket | null>(null)
   const [isConnected, setIsConnected] = useState(false)
@@ -63,7 +68,15 @@ const useWebSocket = (url: string | null, options: UseWebSocketOptions = {}) => 
     } catch (error) {
       console.error("WebSocket connection error:", error)
     }
-  }, [url, onMessage, onOpen, onClose, onError, reconnectInterval, reconnectAttempts])
+  }, [
+    url,
+    onMessage,
+    onOpen,
+    onClose,
+    onError,
+    reconnectInterval,
+    reconnectAttempts,
+  ])
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {

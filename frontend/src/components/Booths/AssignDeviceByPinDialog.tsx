@@ -1,18 +1,18 @@
+import { Plus } from "lucide-react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { DevicesService } from "@/services/devices"
 import useCustomToast from "@/hooks/useCustomToast"
-import { Plus } from "lucide-react"
+import { DevicesService } from "@/services/devices"
 
 interface AssignDeviceByPinDialogProps {
   boothId: string
@@ -20,7 +20,11 @@ interface AssignDeviceByPinDialogProps {
   onSuccess?: () => void
 }
 
-export function AssignDeviceByPinDialog({ boothId, boothName, onSuccess }: AssignDeviceByPinDialogProps) {
+export function AssignDeviceByPinDialog({
+  boothId,
+  boothName,
+  onSuccess,
+}: AssignDeviceByPinDialogProps) {
   const [open, setOpen] = useState(false)
   const [pin, setPin] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -39,7 +43,7 @@ export function AssignDeviceByPinDialog({ boothId, boothName, onSuccess }: Assig
       setPin("")
       setOpen(false)
       onSuccess?.()
-    } catch (error) {
+    } catch (_error) {
       showErrorToast("Failed to assign device. Check if PIN is correct.")
     } finally {
       setIsLoading(false)

@@ -14,13 +14,18 @@ const filters = [
   { id: "Bright", label: "Bright" },
 ]
 
-export default function FilterSelector({ selectedFilter, onSelect, disabled }: FilterSelectorProps) {
+export default function FilterSelector({
+  selectedFilter,
+  onSelect,
+  disabled,
+}: FilterSelectorProps) {
   return (
     <div className="flex gap-2 overflow-x-auto no-scrollbar px-2">
       {filters.map((f) => {
         const isActive = f.id === selectedFilter
         return (
           <button
+            type="button"
             key={f.id}
             disabled={disabled}
             onClick={() => onSelect(f.id)}
@@ -42,7 +47,9 @@ export default function FilterSelector({ selectedFilter, onSelect, disabled }: F
             <span
               className="rounded-full px-1.5 py-0.5 text-[8px]"
               style={{
-                background: isActive ? "rgba(255,255,255,0.2)" : "var(--k-surface-container-high)",
+                background: isActive
+                  ? "rgba(255,255,255,0.2)"
+                  : "var(--k-surface-container-high)",
               }}
             >
               Free

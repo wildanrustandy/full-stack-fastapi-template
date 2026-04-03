@@ -1,4 +1,11 @@
-import { Briefcase, Home, Users, Camera, BarChart3, DollarSign } from "lucide-react"
+import {
+  BarChart3,
+  Briefcase,
+  Camera,
+  DollarSign,
+  Home,
+  Users,
+} from "lucide-react"
 
 import { SidebarAppearance } from "@/components/Common/Appearance"
 import { Logo } from "@/components/Common/Logo"

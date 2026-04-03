@@ -4,14 +4,14 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from sqlmodel import SQLModel
 
-from app.api.deps import CurrentUser, SessionDep
 from app import crud
+from app.api.deps import CurrentUser, SessionDep
 from app.models import (
+    BoothConfigUpdate,
+    BoothCreate,
     BoothPublic,
     BoothsPublic,
-    BoothCreate,
     BoothUpdate,
-    BoothConfigUpdate,
     Message,
 )
 
@@ -79,17 +79,10 @@ async def update_booth(
         raise HTTPException(status_code=404, detail="Booth not found")
 
     was_active = booth.is_active
-    print(
-        f"DEBUG: Booth {id} was_active={was_active}, updating with booth_in={booth_in}"
-    )
     booth = crud.update_booth(session=session, db_booth=booth, booth_in=booth_in)
-    print(
-        f"DEBUG: After update, booth.is_active={booth.is_active}, device_id={booth.device_id}"
-    )
 
     # If booth was deactivated and has a device assigned, notify the device
     if was_active and not booth.is_active and booth.device_id:
-        print(f"DEBUG: Notifying device {booth.device_id} of deactivation")
         from app.api.routes import websocket
 
         await websocket.notify_device_assignment(
@@ -188,7 +181,8 @@ async def unassign_device(
         await websocket.notify_device_assignment(device_id=device_id, booth_id=None)
 
         # Broadcast booth update to admin panel
-        await websocket.broadcast_booth_update(str(booth.id), "device_unassigned")
+        if booth:
+            await websocket.broadcast_booth_update(str(booth.id), "device_unassigned")
 
     return booth
 

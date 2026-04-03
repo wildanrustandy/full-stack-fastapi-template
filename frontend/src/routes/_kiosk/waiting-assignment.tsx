@@ -1,7 +1,7 @@
 import { createFileRoute, Navigate } from "@tanstack/react-router"
-import { useKioskDevice } from "@/hooks/useKioskDevice"
-import { Monitor, Wifi, Loader2 } from "lucide-react"
+import { Loader2, Monitor, Wifi } from "lucide-react"
 import { useEffect, useState } from "react"
+import { useKioskDevice } from "@/hooks/useKioskDevice"
 
 export const Route = createFileRoute("/_kiosk/waiting-assignment")({
   component: WaitingAssignment,
@@ -15,7 +15,7 @@ function WaitingAssignment() {
   // Animated dots
   useEffect(() => {
     const interval = setInterval(() => {
-      setDots(prev => prev.length >= 3 ? "." : prev + ".")
+      setDots((prev) => (prev.length >= 3 ? "." : `${prev}.`))
     }, 500)
     return () => clearInterval(interval)
   }, [])
@@ -29,8 +29,12 @@ function WaitingAssignment() {
     <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-8">
       {/* Status indicator */}
       <div className="absolute top-6 right-6 flex items-center gap-2">
-        <div className={`w-2 h-2 rounded-full ${connectionStatus === "connected" ? "bg-green-500 animate-pulse" : "bg-red-500"}`} />
-        <Wifi className={`h-4 w-4 ${connectionStatus === "connected" ? "text-green-500" : "text-red-500"}`} />
+        <div
+          className={`w-2 h-2 rounded-full ${connectionStatus === "connected" ? "bg-green-500 animate-pulse" : "bg-red-500"}`}
+        />
+        <Wifi
+          className={`h-4 w-4 ${connectionStatus === "connected" ? "text-green-500" : "text-red-500"}`}
+        />
         <span className="text-sm text-muted-foreground">
           {connectionStatus === "connected" ? "Connected" : "Offline"}
         </span>
@@ -51,8 +55,8 @@ function WaitingAssignment() {
             {unassignedReason ? "Disconnected" : "Waiting for Assignment"}
           </h1>
           <p className="text-lg text-muted-foreground">
-            {unassignedReason 
-              ? `Reason: ${unassignedReason}` 
+            {unassignedReason
+              ? `Reason: ${unassignedReason}`
               : "This kiosk needs to be assigned to a booth"}
           </p>
         </div>
@@ -74,7 +78,8 @@ function WaitingAssignment() {
 
         {/* Device ID (small, for reference) */}
         <div className="text-xs text-muted-foreground">
-          Device: <code className="bg-white/5 px-2 py-1 rounded">{deviceId}</code>
+          Device:{" "}
+          <code className="bg-white/5 px-2 py-1 rounded">{deviceId}</code>
         </div>
 
         {/* Loading indicator */}

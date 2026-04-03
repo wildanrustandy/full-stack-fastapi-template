@@ -1,11 +1,14 @@
-import { useState, useEffect, useCallback } from "react"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { useCallback, useEffect, useState } from "react"
 import { z } from "zod"
-import { useCreateDemoPayment, useCheckPaymentStatus } from "@/hooks/usePhotobooth"
-import ProgressIndicator from "@/components/Kiosk/ProgressIndicator"
 import BoothNameHeader from "@/components/Kiosk/BoothNameHeader"
 import CountdownTimer from "@/components/Kiosk/CountdownTimer"
+import ProgressIndicator from "@/components/Kiosk/ProgressIndicator"
 import QRDisplay from "@/components/Kiosk/QRDisplay"
+import {
+  useCheckPaymentStatus,
+  useCreateDemoPayment,
+} from "@/hooks/usePhotobooth"
 
 const paymentSearchSchema = z.object({
   printCount: z.coerce.number(),
@@ -18,7 +21,11 @@ export const Route = createFileRoute("/_kiosk/payment")({
 })
 
 function formatRupiah(amount: number): string {
-  return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(amount)
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+  }).format(amount)
 }
 
 function formatCountdown(seconds: number): string {
@@ -39,7 +46,9 @@ function PaymentPage() {
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [referenceId, setReferenceId] = useState<string | null>(null)
   const [qrCodeUrl] = useState<string | null>(null)
-  const [paymentStatus, setPaymentStatus] = useState<"pending" | "success" | "failed">("pending")
+  const [paymentStatus, setPaymentStatus] = useState<
+    "pending" | "success" | "failed"
+  >("pending")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS)
@@ -72,7 +81,10 @@ function PaymentPage() {
   useEffect(() => {
     if (paymentStatus === "success") {
       const timeout = setTimeout(() => {
-        navigate({ to: "/photo-session", search: { sessionId: sessionId ?? undefined } })
+        navigate({
+          to: "/photo-session",
+          search: { sessionId: sessionId ?? undefined },
+        })
       }, 2500)
       return () => clearTimeout(timeout)
     }
@@ -110,18 +122,33 @@ function PaymentPage() {
   useEffect(() => {
     handleDemoPayment()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [handleDemoPayment])
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: "var(--k-background)", color: "var(--k-on-surface)" }}>
+    <div
+      className="relative flex h-full w-full flex-col overflow-hidden"
+      style={{
+        background: "var(--k-background)",
+        color: "var(--k-on-surface)",
+      }}
+    >
       {/* Success Overlay */}
       {paymentStatus === "success" && (
         <div className="absolute inset-0 z-[100] flex flex-col items-center justify-center rounded-3xl bg-white/90 backdrop-blur-sm">
           <div className="mb-8 flex h-32 w-32 scale-110 items-center justify-center rounded-full bg-green-500 shadow-2xl animate-pulse">
-            <span className="material-symbols-outlined text-7xl font-bold text-white">check</span>
+            <span className="material-symbols-outlined text-7xl font-bold text-white">
+              check
+            </span>
           </div>
-          <h2 className="font-headline mb-3 text-4xl font-extrabold tracking-tight">Pembayaran Berhasil!</h2>
-          <p className="animate-pulse text-xl font-medium" style={{ color: "var(--k-on-surface-variant)" }}>Menyiapkan Sesi Foto...</p>
+          <h2 className="font-headline mb-3 text-4xl font-extrabold tracking-tight">
+            Pembayaran Berhasil!
+          </h2>
+          <p
+            className="animate-pulse text-xl font-medium"
+            style={{ color: "var(--k-on-surface-variant)" }}
+          >
+            Menyiapkan Sesi Foto...
+          </p>
         </div>
       )}
 
@@ -129,26 +156,53 @@ function PaymentPage() {
       {paymentStatus === "failed" && (
         <div className="absolute inset-0 z-[100] flex flex-col items-center justify-center rounded-3xl bg-white/90 backdrop-blur-sm">
           <div className="mb-8 flex h-32 w-32 scale-110 items-center justify-center rounded-full bg-red-500 shadow-2xl animate-pulse">
-            <span className="material-symbols-outlined text-7xl font-bold text-white">close</span>
+            <span className="material-symbols-outlined text-7xl font-bold text-white">
+              close
+            </span>
           </div>
-          <h2 className="font-headline mb-3 text-4xl font-extrabold tracking-tight">Waktu Habis / Gagal</h2>
-          <p className="animate-pulse text-xl font-medium" style={{ color: "var(--k-on-surface-variant)" }}>Mengembalikan ke Halaman Utama...</p>
+          <h2 className="font-headline mb-3 text-4xl font-extrabold tracking-tight">
+            Waktu Habis / Gagal
+          </h2>
+          <p
+            className="animate-pulse text-xl font-medium"
+            style={{ color: "var(--k-on-surface-variant)" }}
+          >
+            Mengembalikan ke Halaman Utama...
+          </p>
         </div>
       )}
 
       {/* Header */}
-      <header className="flex flex-none items-center justify-between px-6 py-4 backdrop-blur-sm lg:px-8 lg:py-6" style={{ background: "rgba(237,248,255,0.8)" }}>
+      <header
+        className="flex flex-none items-center justify-between px-6 py-4 backdrop-blur-sm lg:px-8 lg:py-6"
+        style={{ background: "rgba(237,248,255,0.8)" }}
+      >
         <BoothNameHeader />
         <nav className="hidden items-center gap-8 md:flex">
-          <span className="font-headline text-sm font-extrabold lg:text-base" style={{ color: "var(--k-primary)", borderBottom: "4px solid var(--k-primary)", paddingBottom: 4 }}>
+          <span
+            className="font-headline text-sm font-extrabold lg:text-base"
+            style={{
+              color: "var(--k-primary)",
+              borderBottom: "4px solid var(--k-primary)",
+              paddingBottom: 4,
+            }}
+          >
             Step 2/4
           </span>
         </nav>
         <div className="flex items-center gap-2 lg:gap-3">
-          <button className="text-xl font-medium transition-transform duration-300 hover:scale-105 lg:text-2xl" style={{ color: "rgba(36,48,54,0.6)" }}>
+          <button
+            type="button"
+            className="text-xl font-medium transition-transform duration-300 hover:scale-105 lg:text-2xl"
+            style={{ color: "rgba(36,48,54,0.6)" }}
+          >
             <span className="material-symbols-outlined">help</span>
           </button>
-          <button className="text-xl font-medium transition-transform duration-300 hover:scale-105 lg:text-2xl" style={{ color: "rgba(36,48,54,0.6)" }}>
+          <button
+            type="button"
+            className="text-xl font-medium transition-transform duration-300 hover:scale-105 lg:text-2xl"
+            style={{ color: "rgba(36,48,54,0.6)" }}
+          >
             <span className="material-symbols-outlined">settings</span>
           </button>
         </div>
@@ -164,7 +218,10 @@ function PaymentPage() {
           <h1 className="font-headline mb-2 text-4xl font-extrabold tracking-tight md:text-5xl">
             Pembayaran QRIS
           </h1>
-          <p className="text-lg font-medium" style={{ color: "var(--k-on-surface-variant)" }}>
+          <p
+            className="text-lg font-medium"
+            style={{ color: "var(--k-on-surface-variant)" }}
+          >
             Scan QR dengan aplikasi pembayaran Anda
           </p>
         </section>
@@ -172,36 +229,86 @@ function PaymentPage() {
         <div className="grid w-full flex-1 min-h-0 grid-cols-1 gap-6 md:grid-cols-12">
           {/* Order Summary */}
           <div className="order-2 flex flex-col gap-6 md:order-1 md:col-span-4">
-            <div className="flex flex-col justify-between rounded-xl p-8 h-full" style={{ background: "var(--k-surface-container-low)", boxShadow: "0 20px 40px rgba(36,48,54,0.06)" }}>
+            <div
+              className="flex flex-col justify-between rounded-xl p-8 h-full"
+              style={{
+                background: "var(--k-surface-container-low)",
+                boxShadow: "0 20px 40px rgba(36,48,54,0.06)",
+              }}
+            >
               <div>
-                <h3 className="font-headline mb-6 text-xl font-bold" style={{ color: "var(--k-primary)" }}>Ringkasan</h3>
+                <h3
+                  className="font-headline mb-6 text-xl font-bold"
+                  style={{ color: "var(--k-primary)" }}
+                >
+                  Ringkasan
+                </h3>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="font-medium" style={{ color: "var(--k-on-surface-variant)" }}>Paket Foto</span>
+                    <span
+                      className="font-medium"
+                      style={{ color: "var(--k-on-surface-variant)" }}
+                    >
+                      Paket Foto
+                    </span>
                     <span className="font-bold">Standard</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="font-medium" style={{ color: "var(--k-on-surface-variant)" }}>Jumlah Cetak</span>
+                    <span
+                      className="font-medium"
+                      style={{ color: "var(--k-on-surface-variant)" }}
+                    >
+                      Jumlah Cetak
+                    </span>
                     <span className="font-bold">{printCount} Lembar</span>
                   </div>
-                  <div className="my-2 h-px w-full" style={{ background: "rgba(196,198,207,0.2)" }} />
+                  <div
+                    className="my-2 h-px w-full"
+                    style={{ background: "rgba(196,198,207,0.2)" }}
+                  />
                   <div className="flex items-end justify-between">
-                    <span className="font-medium" style={{ color: "var(--k-on-surface-variant)" }}>Total Harga</span>
-                    <span className="font-headline text-2xl font-black">{formatRupiah(amount)}</span>
+                    <span
+                      className="font-medium"
+                      style={{ color: "var(--k-on-surface-variant)" }}
+                    >
+                      Total Harga
+                    </span>
+                    <span className="font-headline text-2xl font-black">
+                      {formatRupiah(amount)}
+                    </span>
                   </div>
                   {referenceId && (
-                    <div className="mt-4 border-t pt-4" style={{ borderColor: "rgba(196,198,207,0.2)" }}>
+                    <div
+                      className="mt-4 border-t pt-4"
+                      style={{ borderColor: "rgba(196,198,207,0.2)" }}
+                    >
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium" style={{ color: "var(--k-on-surface-variant)" }}>Ref ID</span>
-                        <span className="font-mono text-sm font-bold tracking-wide" style={{ color: "var(--k-primary)" }}>{referenceId}</span>
+                        <span
+                          className="text-sm font-medium"
+                          style={{ color: "var(--k-on-surface-variant)" }}
+                        >
+                          Ref ID
+                        </span>
+                        <span
+                          className="font-mono text-sm font-bold tracking-wide"
+                          style={{ color: "var(--k-primary)" }}
+                        >
+                          {referenceId}
+                        </span>
                       </div>
                     </div>
                   )}
                 </div>
               </div>
 
-              <div className="mt-8 border-t pt-8" style={{ borderColor: "rgba(196,198,207,0.1)" }}>
-                <CountdownTimer formattedTime={formatCountdown(countdown)} isWarning={countdown <= 60} />
+              <div
+                className="mt-8 border-t pt-8"
+                style={{ borderColor: "rgba(196,198,207,0.1)" }}
+              >
+                <CountdownTimer
+                  formattedTime={formatCountdown(countdown)}
+                  isWarning={countdown <= 60}
+                />
               </div>
             </div>
           </div>
@@ -221,34 +328,67 @@ function PaymentPage() {
         {/* 3-step Instructions */}
         <div className="mb-4 mt-6 w-full grid grid-cols-1 gap-6 flex-none md:grid-cols-3">
           <div className="flex items-start gap-4 p-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(167,41,90,0.1)" }}>
-              <span className="material-symbols-outlined font-bold" style={{ color: "var(--k-primary)" }}>qr_code_scanner</span>
+            <div
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+              style={{ background: "rgba(167,41,90,0.1)" }}
+            >
+              <span
+                className="material-symbols-outlined font-bold"
+                style={{ color: "var(--k-primary)" }}
+              >
+                qr_code_scanner
+              </span>
             </div>
             <div>
               <h4 className="font-headline font-bold">Buka Aplikasi</h4>
-              <p className="text-sm" style={{ color: "var(--k-on-surface-variant)" }}>
+              <p
+                className="text-sm"
+                style={{ color: "var(--k-on-surface-variant)" }}
+              >
                 Gunakan Dana, GoPay, OVO, ShopeePay, atau BCA Mobile.
               </p>
             </div>
           </div>
           <div className="flex items-start gap-4 p-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(167,41,90,0.1)" }}>
-              <span className="material-symbols-outlined font-bold" style={{ color: "var(--k-primary)" }}>ads_click</span>
+            <div
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+              style={{ background: "rgba(167,41,90,0.1)" }}
+            >
+              <span
+                className="material-symbols-outlined font-bold"
+                style={{ color: "var(--k-primary)" }}
+              >
+                ads_click
+              </span>
             </div>
             <div>
               <h4 className="font-headline font-bold">Scan & Bayar</h4>
-              <p className="text-sm" style={{ color: "var(--k-on-surface-variant)" }}>
+              <p
+                className="text-sm"
+                style={{ color: "var(--k-on-surface-variant)" }}
+              >
                 Pindai kode QR dan masukkan PIN keamanan Anda.
               </p>
             </div>
           </div>
           <div className="flex items-start gap-4 p-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full" style={{ background: "rgba(167,41,90,0.1)" }}>
-              <span className="material-symbols-outlined font-bold" style={{ color: "var(--k-primary)" }}>task_alt</span>
+            <div
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+              style={{ background: "rgba(167,41,90,0.1)" }}
+            >
+              <span
+                className="material-symbols-outlined font-bold"
+                style={{ color: "var(--k-primary)" }}
+              >
+                task_alt
+              </span>
             </div>
             <div>
               <h4 className="font-headline font-bold">Konfirmasi</h4>
-              <p className="text-sm" style={{ color: "var(--k-on-surface-variant)" }}>
+              <p
+                className="text-sm"
+                style={{ color: "var(--k-on-surface-variant)" }}
+              >
                 Layar akan otomatis beralih setelah pembayaran berhasil.
               </p>
             </div>
@@ -257,9 +397,15 @@ function PaymentPage() {
       </main>
 
       {/* Footer */}
-      <footer className="flex flex-none items-center justify-around rounded-t-[2rem] px-10 py-6 shadow-[0_-20px_40px_rgba(36,48,54,0.06)] backdrop-blur-xl lg:rounded-t-[3rem]" style={{ background: "rgba(255,255,255,0.6)" }}>
+      <footer
+        className="flex flex-none items-center justify-around rounded-t-[2rem] px-10 py-6 shadow-[0_-20px_40px_rgba(36,48,54,0.06)] backdrop-blur-xl lg:rounded-t-[3rem]"
+        style={{ background: "rgba(255,255,255,0.6)" }}
+      >
         {paymentStatus === "pending" && (
-          <div className="flex flex-col items-center animate-pulse" style={{ color: "rgba(82,96,104,0.4)" }}>
+          <div
+            className="flex flex-col items-center animate-pulse"
+            style={{ color: "rgba(82,96,104,0.4)" }}
+          >
             <span className="font-headline text-xs font-bold uppercase tracking-[0.2em]">
               Menunggu Pembayaran...
             </span>

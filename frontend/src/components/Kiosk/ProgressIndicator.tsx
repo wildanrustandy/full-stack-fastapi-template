@@ -4,7 +4,9 @@ interface ProgressIndicatorProps {
 
 const steps = ["Pilih Jumlah", "Pembayaran", "Sesi Foto", "Cetak"]
 
-export default function ProgressIndicator({ currentStep }: ProgressIndicatorProps) {
+export default function ProgressIndicator({
+  currentStep,
+}: ProgressIndicatorProps) {
   return (
     <div className="flex items-center gap-1">
       {steps.map((label, i) => {
@@ -24,18 +26,25 @@ export default function ProgressIndicator({ currentStep }: ProgressIndicatorProp
                       : "text-[var(--k-on-surface-variant)]"
                 }`}
                 style={{
-                  backgroundColor: isActive || isCompleted ? "var(--k-primary)" : "var(--k-surface-container)",
+                  backgroundColor:
+                    isActive || isCompleted
+                      ? "var(--k-primary)"
+                      : "var(--k-surface-container)",
                 }}
               >
                 {isCompleted ? (
-                  <span className="material-symbols-outlined text-sm">check</span>
+                  <span className="material-symbols-outlined text-sm">
+                    check
+                  </span>
                 ) : (
                   step
                 )}
               </div>
               <span
                 className={`mt-1 text-[10px] font-bold tracking-wide ${
-                  isActive ? "text-[var(--k-primary)]" : "text-[var(--k-on-surface-variant)]/60"
+                  isActive
+                    ? "text-[var(--k-primary)]"
+                    : "text-[var(--k-on-surface-variant)]/60"
                 }`}
               >
                 {label}

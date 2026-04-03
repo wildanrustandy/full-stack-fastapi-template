@@ -1,7 +1,7 @@
 import hashlib
 import hmac
 import json
-from datetime import datetime, timezone
+from datetime import datetime
 
 import httpx
 from fastapi import HTTPException
@@ -22,7 +22,11 @@ def generate_signature(body: str, va: str, api_key: str) -> tuple[str, str]:
 
 
 def create_payment_request(
-    session, amount: float, product_name: str, print_count: int, notify_url: str
+    session,  # noqa: ARG001
+    amount: float,
+    product_name: str,
+    print_count: int,  # noqa: ARG001
+    notify_url: str,
 ) -> dict:
     reference_id = "PB" + datetime.now().strftime("%Y%m%d%H%M%S")
 

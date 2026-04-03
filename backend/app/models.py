@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from pydantic import EmailStr
-from sqlalchemy import DateTime, JSON, Numeric, Text
+from sqlalchemy import JSON, DateTime, Numeric, Text
 from sqlmodel import Field, Relationship, SQLModel
 
 

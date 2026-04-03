@@ -294,7 +294,7 @@ def create_photo(*, session: Session, photo_in: PhotoCreate) -> Photo:
 
 def get_photos_by_session(*, session: Session, session_id: uuid.UUID) -> list[Photo]:
     statement = (
-        select(Photo).where(Photo.session_id == session_id).order_by(Photo.order)
+        select(Photo).where(Photo.session_id == session_id).order_by(col(Photo.order))  # type: ignore[arg-type]
     )
     return list(session.exec(statement).all())
 
@@ -308,7 +308,8 @@ def get_transactions(
     limit: int = 100,
 ) -> list[Payment]:
     statement = select(Payment).options(
-        selectinload(Payment.session).selectinload(KioskSession.booth)  # type: ignore[attr-defined]
+        selectinload(Payment.session),  # type: ignore[arg-type]
+        selectinload(Payment.session).selectinload(KioskSession.booth),  # type: ignore[arg-type]
     )
     if booth_id is not None:
         statement = statement.where(Payment.booth_id == booth_id)
