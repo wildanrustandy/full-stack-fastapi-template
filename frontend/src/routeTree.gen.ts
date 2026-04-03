@@ -14,10 +14,20 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RecoverPasswordRouteImport } from './routes/recover-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LayoutRouteImport } from './routes/_layout'
+import { Route as KioskRouteImport } from './routes/_kiosk'
 import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
 import { Route as LayoutSettingsRouteImport } from './routes/_layout/settings'
+import { Route as LayoutPhotoboothTransactionsRouteImport } from './routes/_layout/photobooth-transactions'
+import { Route as LayoutPhotoboothDashboardRouteImport } from './routes/_layout/photobooth-dashboard'
+import { Route as LayoutPhotoboothBoothsRouteImport } from './routes/_layout/photobooth-booths'
 import { Route as LayoutItemsRouteImport } from './routes/_layout/items'
 import { Route as LayoutAdminRouteImport } from './routes/_layout/admin'
+import { Route as KioskPrintCountRouteImport } from './routes/_kiosk/print-count'
+import { Route as KioskPreviewRouteImport } from './routes/_kiosk/preview'
+import { Route as KioskPhotoSessionRouteImport } from './routes/_kiosk/photo-session'
+import { Route as KioskPaymentRouteImport } from './routes/_kiosk/payment'
+import { Route as KioskOutputRouteImport } from './routes/_kiosk/output'
+import { Route as KioskLandingRouteImport } from './routes/_kiosk/landing'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -43,6 +53,10 @@ const LayoutRoute = LayoutRouteImport.update({
   id: '/_layout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KioskRoute = KioskRouteImport.update({
+  id: '/_kiosk',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LayoutIndexRoute = LayoutIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -51,6 +65,23 @@ const LayoutIndexRoute = LayoutIndexRouteImport.update({
 const LayoutSettingsRoute = LayoutSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutPhotoboothTransactionsRoute =
+  LayoutPhotoboothTransactionsRouteImport.update({
+    id: '/photobooth-transactions',
+    path: '/photobooth-transactions',
+    getParentRoute: () => LayoutRoute,
+  } as any)
+const LayoutPhotoboothDashboardRoute =
+  LayoutPhotoboothDashboardRouteImport.update({
+    id: '/photobooth-dashboard',
+    path: '/photobooth-dashboard',
+    getParentRoute: () => LayoutRoute,
+  } as any)
+const LayoutPhotoboothBoothsRoute = LayoutPhotoboothBoothsRouteImport.update({
+  id: '/photobooth-booths',
+  path: '/photobooth-booths',
   getParentRoute: () => LayoutRoute,
 } as any)
 const LayoutItemsRoute = LayoutItemsRouteImport.update({
@@ -63,74 +94,161 @@ const LayoutAdminRoute = LayoutAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => LayoutRoute,
 } as any)
+const KioskPrintCountRoute = KioskPrintCountRouteImport.update({
+  id: '/print-count',
+  path: '/print-count',
+  getParentRoute: () => KioskRoute,
+} as any)
+const KioskPreviewRoute = KioskPreviewRouteImport.update({
+  id: '/preview',
+  path: '/preview',
+  getParentRoute: () => KioskRoute,
+} as any)
+const KioskPhotoSessionRoute = KioskPhotoSessionRouteImport.update({
+  id: '/photo-session',
+  path: '/photo-session',
+  getParentRoute: () => KioskRoute,
+} as any)
+const KioskPaymentRoute = KioskPaymentRouteImport.update({
+  id: '/payment',
+  path: '/payment',
+  getParentRoute: () => KioskRoute,
+} as any)
+const KioskOutputRoute = KioskOutputRouteImport.update({
+  id: '/output',
+  path: '/output',
+  getParentRoute: () => KioskRoute,
+} as any)
+const KioskLandingRoute = KioskLandingRouteImport.update({
+  id: '/landing',
+  path: '/landing',
+  getParentRoute: () => KioskRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof LayoutIndexRoute
   '/login': typeof LoginRoute
   '/recover-password': typeof RecoverPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/landing': typeof KioskLandingRoute
+  '/output': typeof KioskOutputRoute
+  '/payment': typeof KioskPaymentRoute
+  '/photo-session': typeof KioskPhotoSessionRoute
+  '/preview': typeof KioskPreviewRoute
+  '/print-count': typeof KioskPrintCountRoute
   '/admin': typeof LayoutAdminRoute
   '/items': typeof LayoutItemsRoute
+  '/photobooth-booths': typeof LayoutPhotoboothBoothsRoute
+  '/photobooth-dashboard': typeof LayoutPhotoboothDashboardRoute
+  '/photobooth-transactions': typeof LayoutPhotoboothTransactionsRoute
   '/settings': typeof LayoutSettingsRoute
-  '/': typeof LayoutIndexRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof LayoutIndexRoute
   '/login': typeof LoginRoute
   '/recover-password': typeof RecoverPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/landing': typeof KioskLandingRoute
+  '/output': typeof KioskOutputRoute
+  '/payment': typeof KioskPaymentRoute
+  '/photo-session': typeof KioskPhotoSessionRoute
+  '/preview': typeof KioskPreviewRoute
+  '/print-count': typeof KioskPrintCountRoute
   '/admin': typeof LayoutAdminRoute
   '/items': typeof LayoutItemsRoute
+  '/photobooth-booths': typeof LayoutPhotoboothBoothsRoute
+  '/photobooth-dashboard': typeof LayoutPhotoboothDashboardRoute
+  '/photobooth-transactions': typeof LayoutPhotoboothTransactionsRoute
   '/settings': typeof LayoutSettingsRoute
-  '/': typeof LayoutIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/_kiosk': typeof KioskRouteWithChildren
   '/_layout': typeof LayoutRouteWithChildren
   '/login': typeof LoginRoute
   '/recover-password': typeof RecoverPasswordRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/_kiosk/landing': typeof KioskLandingRoute
+  '/_kiosk/output': typeof KioskOutputRoute
+  '/_kiosk/payment': typeof KioskPaymentRoute
+  '/_kiosk/photo-session': typeof KioskPhotoSessionRoute
+  '/_kiosk/preview': typeof KioskPreviewRoute
+  '/_kiosk/print-count': typeof KioskPrintCountRoute
   '/_layout/admin': typeof LayoutAdminRoute
   '/_layout/items': typeof LayoutItemsRoute
+  '/_layout/photobooth-booths': typeof LayoutPhotoboothBoothsRoute
+  '/_layout/photobooth-dashboard': typeof LayoutPhotoboothDashboardRoute
+  '/_layout/photobooth-transactions': typeof LayoutPhotoboothTransactionsRoute
   '/_layout/settings': typeof LayoutSettingsRoute
   '/_layout/': typeof LayoutIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/login'
     | '/recover-password'
     | '/reset-password'
     | '/signup'
+    | '/landing'
+    | '/output'
+    | '/payment'
+    | '/photo-session'
+    | '/preview'
+    | '/print-count'
     | '/admin'
     | '/items'
+    | '/photobooth-booths'
+    | '/photobooth-dashboard'
+    | '/photobooth-transactions'
     | '/settings'
-    | '/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/login'
     | '/recover-password'
     | '/reset-password'
     | '/signup'
+    | '/landing'
+    | '/output'
+    | '/payment'
+    | '/photo-session'
+    | '/preview'
+    | '/print-count'
     | '/admin'
     | '/items'
+    | '/photobooth-booths'
+    | '/photobooth-dashboard'
+    | '/photobooth-transactions'
     | '/settings'
-    | '/'
   id:
     | '__root__'
+    | '/_kiosk'
     | '/_layout'
     | '/login'
     | '/recover-password'
     | '/reset-password'
     | '/signup'
+    | '/_kiosk/landing'
+    | '/_kiosk/output'
+    | '/_kiosk/payment'
+    | '/_kiosk/photo-session'
+    | '/_kiosk/preview'
+    | '/_kiosk/print-count'
     | '/_layout/admin'
     | '/_layout/items'
+    | '/_layout/photobooth-booths'
+    | '/_layout/photobooth-dashboard'
+    | '/_layout/photobooth-transactions'
     | '/_layout/settings'
     | '/_layout/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  KioskRoute: typeof KioskRouteWithChildren
   LayoutRoute: typeof LayoutRouteWithChildren
   LoginRoute: typeof LoginRoute
   RecoverPasswordRoute: typeof RecoverPasswordRoute
@@ -171,8 +289,15 @@ declare module '@tanstack/react-router' {
     '/_layout': {
       id: '/_layout'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof LayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_kiosk': {
+      id: '/_kiosk'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof KioskRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_layout/': {
@@ -189,6 +314,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutSettingsRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/photobooth-transactions': {
+      id: '/_layout/photobooth-transactions'
+      path: '/photobooth-transactions'
+      fullPath: '/photobooth-transactions'
+      preLoaderRoute: typeof LayoutPhotoboothTransactionsRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/photobooth-dashboard': {
+      id: '/_layout/photobooth-dashboard'
+      path: '/photobooth-dashboard'
+      fullPath: '/photobooth-dashboard'
+      preLoaderRoute: typeof LayoutPhotoboothDashboardRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/photobooth-booths': {
+      id: '/_layout/photobooth-booths'
+      path: '/photobooth-booths'
+      fullPath: '/photobooth-booths'
+      preLoaderRoute: typeof LayoutPhotoboothBoothsRouteImport
+      parentRoute: typeof LayoutRoute
+    }
     '/_layout/items': {
       id: '/_layout/items'
       path: '/items'
@@ -203,12 +349,77 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAdminRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_kiosk/print-count': {
+      id: '/_kiosk/print-count'
+      path: '/print-count'
+      fullPath: '/print-count'
+      preLoaderRoute: typeof KioskPrintCountRouteImport
+      parentRoute: typeof KioskRoute
+    }
+    '/_kiosk/preview': {
+      id: '/_kiosk/preview'
+      path: '/preview'
+      fullPath: '/preview'
+      preLoaderRoute: typeof KioskPreviewRouteImport
+      parentRoute: typeof KioskRoute
+    }
+    '/_kiosk/photo-session': {
+      id: '/_kiosk/photo-session'
+      path: '/photo-session'
+      fullPath: '/photo-session'
+      preLoaderRoute: typeof KioskPhotoSessionRouteImport
+      parentRoute: typeof KioskRoute
+    }
+    '/_kiosk/payment': {
+      id: '/_kiosk/payment'
+      path: '/payment'
+      fullPath: '/payment'
+      preLoaderRoute: typeof KioskPaymentRouteImport
+      parentRoute: typeof KioskRoute
+    }
+    '/_kiosk/output': {
+      id: '/_kiosk/output'
+      path: '/output'
+      fullPath: '/output'
+      preLoaderRoute: typeof KioskOutputRouteImport
+      parentRoute: typeof KioskRoute
+    }
+    '/_kiosk/landing': {
+      id: '/_kiosk/landing'
+      path: '/landing'
+      fullPath: '/landing'
+      preLoaderRoute: typeof KioskLandingRouteImport
+      parentRoute: typeof KioskRoute
+    }
   }
 }
+
+interface KioskRouteChildren {
+  KioskLandingRoute: typeof KioskLandingRoute
+  KioskOutputRoute: typeof KioskOutputRoute
+  KioskPaymentRoute: typeof KioskPaymentRoute
+  KioskPhotoSessionRoute: typeof KioskPhotoSessionRoute
+  KioskPreviewRoute: typeof KioskPreviewRoute
+  KioskPrintCountRoute: typeof KioskPrintCountRoute
+}
+
+const KioskRouteChildren: KioskRouteChildren = {
+  KioskLandingRoute: KioskLandingRoute,
+  KioskOutputRoute: KioskOutputRoute,
+  KioskPaymentRoute: KioskPaymentRoute,
+  KioskPhotoSessionRoute: KioskPhotoSessionRoute,
+  KioskPreviewRoute: KioskPreviewRoute,
+  KioskPrintCountRoute: KioskPrintCountRoute,
+}
+
+const KioskRouteWithChildren = KioskRoute._addFileChildren(KioskRouteChildren)
 
 interface LayoutRouteChildren {
   LayoutAdminRoute: typeof LayoutAdminRoute
   LayoutItemsRoute: typeof LayoutItemsRoute
+  LayoutPhotoboothBoothsRoute: typeof LayoutPhotoboothBoothsRoute
+  LayoutPhotoboothDashboardRoute: typeof LayoutPhotoboothDashboardRoute
+  LayoutPhotoboothTransactionsRoute: typeof LayoutPhotoboothTransactionsRoute
   LayoutSettingsRoute: typeof LayoutSettingsRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
 }
@@ -216,6 +427,9 @@ interface LayoutRouteChildren {
 const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutAdminRoute: LayoutAdminRoute,
   LayoutItemsRoute: LayoutItemsRoute,
+  LayoutPhotoboothBoothsRoute: LayoutPhotoboothBoothsRoute,
+  LayoutPhotoboothDashboardRoute: LayoutPhotoboothDashboardRoute,
+  LayoutPhotoboothTransactionsRoute: LayoutPhotoboothTransactionsRoute,
   LayoutSettingsRoute: LayoutSettingsRoute,
   LayoutIndexRoute: LayoutIndexRoute,
 }
@@ -224,6 +438,7 @@ const LayoutRouteWithChildren =
   LayoutRoute._addFileChildren(LayoutRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  KioskRoute: KioskRouteWithChildren,
   LayoutRoute: LayoutRouteWithChildren,
   LoginRoute: LoginRoute,
   RecoverPasswordRoute: RecoverPasswordRoute,

@@ -57,6 +57,288 @@ export const Body_login_login_access_tokenSchema = {
     title: 'Body_login-login_access_token'
 } as const;
 
+export const BoothAssignDeviceSchema = {
+    properties: {
+        device_id: {
+            type: 'string',
+            title: 'Device Id'
+        }
+    },
+    type: 'object',
+    required: ['device_id'],
+    title: 'BoothAssignDevice'
+} as const;
+
+export const BoothConfigUpdateSchema = {
+    properties: {
+        price_per_print: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Price Per Print'
+        },
+        timer_default: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Timer Default'
+        },
+        max_print: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Max Print'
+        },
+        filters: {
+            anyOf: [
+                {
+                    items: {
+                        type: 'string'
+                    },
+                    type: 'array'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Filters'
+        },
+        payment_timeout: {
+            anyOf: [
+                {
+                    type: 'integer'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Payment Timeout'
+        }
+    },
+    type: 'object',
+    title: 'BoothConfigUpdate'
+} as const;
+
+export const BoothCreateSchema = {
+    properties: {
+        name: {
+            type: 'string',
+            maxLength: 100,
+            minLength: 1,
+            title: 'Name'
+        },
+        location: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 255
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Location'
+        },
+        is_active: {
+            type: 'boolean',
+            title: 'Is Active',
+            default: true
+        },
+        config: {
+            anyOf: [
+                {
+                    additionalProperties: true,
+                    type: 'object'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Config'
+        }
+    },
+    type: 'object',
+    required: ['name'],
+    title: 'BoothCreate'
+} as const;
+
+export const BoothPublicSchema = {
+    properties: {
+        name: {
+            type: 'string',
+            maxLength: 100,
+            minLength: 1,
+            title: 'Name'
+        },
+        location: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 255
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Location'
+        },
+        is_active: {
+            type: 'boolean',
+            title: 'Is Active',
+            default: true
+        },
+        id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Id'
+        },
+        device_id: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Device Id'
+        },
+        current_session_id: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'uuid'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Current Session Id'
+        },
+        config: {
+            additionalProperties: true,
+            type: 'object',
+            title: 'Config'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        },
+        updated_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Updated At'
+        },
+        last_active_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Last Active At'
+        }
+    },
+    type: 'object',
+    required: ['name', 'id'],
+    title: 'BoothPublic'
+} as const;
+
+export const BoothUpdateSchema = {
+    properties: {
+        name: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 100,
+                    minLength: 1
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Name'
+        },
+        location: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 255
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Location'
+        },
+        is_active: {
+            anyOf: [
+                {
+                    type: 'boolean'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Is Active'
+        }
+    },
+    type: 'object',
+    title: 'BoothUpdate'
+} as const;
+
+export const BoothsPublicSchema = {
+    properties: {
+        data: {
+            items: {
+                '$ref': '#/components/schemas/BoothPublic'
+            },
+            type: 'array',
+            title: 'Data'
+        },
+        count: {
+            type: 'integer',
+            title: 'Count'
+        }
+    },
+    type: 'object',
+    required: ['data', 'count'],
+    title: 'BoothsPublic'
+} as const;
+
 export const HTTPValidationErrorSchema = {
     properties: {
         detail: {
@@ -196,6 +478,85 @@ export const ItemsPublicSchema = {
     title: 'ItemsPublic'
 } as const;
 
+export const KioskSessionPublicSchema = {
+    properties: {
+        print_count: {
+            type: 'integer',
+            maximum: 10,
+            minimum: 1,
+            title: 'Print Count',
+            default: 1
+        },
+        filter_name: {
+            type: 'string',
+            maxLength: 50,
+            title: 'Filter Name',
+            default: 'normal'
+        },
+        timer: {
+            type: 'integer',
+            title: 'Timer',
+            default: 5
+        },
+        id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Id'
+        },
+        booth_id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Booth Id'
+        },
+        device_id: {
+            type: 'string',
+            title: 'Device Id'
+        },
+        status: {
+            type: 'string',
+            title: 'Status'
+        },
+        total_price: {
+            anyOf: [
+                {
+                    type: 'number'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Total Price'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        },
+        completed_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Completed At'
+        }
+    },
+    type: 'object',
+    required: ['id', 'booth_id', 'device_id', 'status'],
+    title: 'KioskSessionPublic'
+} as const;
+
 export const MessageSchema = {
     properties: {
         message: {
@@ -224,6 +585,144 @@ export const NewPasswordSchema = {
     type: 'object',
     required: ['token', 'new_password'],
     title: 'NewPassword'
+} as const;
+
+export const PaymentPublicSchema = {
+    properties: {
+        amount: {
+            type: 'number',
+            title: 'Amount'
+        },
+        provider: {
+            type: 'string',
+            maxLength: 50,
+            title: 'Provider',
+            default: 'qris'
+        },
+        id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Id'
+        },
+        session_id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Session Id'
+        },
+        booth_id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Booth Id'
+        },
+        status: {
+            type: 'string',
+            title: 'Status'
+        },
+        reference_id: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Reference Id'
+        },
+        qr_string: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Qr String'
+        },
+        transaction_id: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Transaction Id'
+        },
+        paid_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Paid At'
+        },
+        expires_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Expires At'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        }
+    },
+    type: 'object',
+    required: ['amount', 'id', 'session_id', 'booth_id', 'status'],
+    title: 'PaymentPublic'
+} as const;
+
+export const PaymentRequestBodySchema = {
+    properties: {
+        amount: {
+            type: 'string',
+            title: 'Amount'
+        },
+        product_name: {
+            type: 'string',
+            title: 'Product Name',
+            default: 'Photobooth Session'
+        },
+        qty: {
+            type: 'string',
+            title: 'Qty',
+            default: '1'
+        },
+        booth_id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Booth Id'
+        },
+        print_count: {
+            type: 'integer',
+            title: 'Print Count',
+            default: 1
+        }
+    },
+    type: 'object',
+    required: ['amount', 'booth_id'],
+    title: 'PaymentRequestBody'
 } as const;
 
 export const PrivateUserCreateSchema = {

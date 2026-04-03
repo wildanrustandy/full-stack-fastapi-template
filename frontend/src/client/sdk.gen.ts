@@ -3,7 +3,187 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
+import type { BoothsReadBoothsData, BoothsReadBoothsResponse, BoothsCreateBoothData, BoothsCreateBoothResponse, BoothsReadBoothData, BoothsReadBoothResponse, BoothsUpdateBoothData, BoothsUpdateBoothResponse, BoothsDeleteBoothData, BoothsDeleteBoothResponse, BoothsUpdateBoothConfigData, BoothsUpdateBoothConfigResponse, BoothsAssignDeviceData, BoothsAssignDeviceResponse, BoothsUnassignDeviceData, BoothsUnassignDeviceResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PaymentsCreatePaymentData, PaymentsCreatePaymentResponse, PaymentsCheckStatusData, PaymentsCheckStatusResponse, PaymentsPaymentNotifyResponse, PaymentsPaymentNotifyTestData, PaymentsPaymentNotifyTestResponse, PaymentsCreateDemoPaymentData, PaymentsCreateDemoPaymentResponse, PhotoboothAdminGetDashboardOverviewResponse, PhotoboothAdminGetRecentTransactionsData, PhotoboothAdminGetRecentTransactionsResponse, PhotoboothAdminGetActiveSessionsResponse, PhotoboothAdminGetRecentSessionsData, PhotoboothAdminGetRecentSessionsResponse, PhotoboothAdminGetTransactionsData, PhotoboothAdminGetTransactionsResponse, PhotoboothAdminGetRevenueReportData, PhotoboothAdminGetRevenueReportResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
+
+export class BoothsService {
+    /**
+     * Read Booths
+     * Retrieve booths.
+     * @param data The data for the request.
+     * @param data.skip
+     * @param data.limit
+     * @returns BoothsPublic Successful Response
+     * @throws ApiError
+     */
+    public static readBooths(data: BoothsReadBoothsData = {}): CancelablePromise<BoothsReadBoothsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/booths/',
+            query: {
+                skip: data.skip,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Create Booth
+     * Create new booth.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns BoothPublic Successful Response
+     * @throws ApiError
+     */
+    public static createBooth(data: BoothsCreateBoothData): CancelablePromise<BoothsCreateBoothResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/booths/',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Read Booth
+     * Get booth by ID.
+     * @param data The data for the request.
+     * @param data.id
+     * @returns BoothPublic Successful Response
+     * @throws ApiError
+     */
+    public static readBooth(data: BoothsReadBoothData): CancelablePromise<BoothsReadBoothResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/booths/{id}',
+            path: {
+                id: data.id
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Update Booth
+     * Update a booth.
+     * @param data The data for the request.
+     * @param data.id
+     * @param data.requestBody
+     * @returns BoothPublic Successful Response
+     * @throws ApiError
+     */
+    public static updateBooth(data: BoothsUpdateBoothData): CancelablePromise<BoothsUpdateBoothResponse> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/api/v1/booths/{id}',
+            path: {
+                id: data.id
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Delete Booth
+     * Delete a booth.
+     * @param data The data for the request.
+     * @param data.id
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static deleteBooth(data: BoothsDeleteBoothData): CancelablePromise<BoothsDeleteBoothResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/booths/{id}',
+            path: {
+                id: data.id
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Update Booth Config
+     * Update booth config.
+     * @param data The data for the request.
+     * @param data.id
+     * @param data.requestBody
+     * @returns BoothPublic Successful Response
+     * @throws ApiError
+     */
+    public static updateBoothConfig(data: BoothsUpdateBoothConfigData): CancelablePromise<BoothsUpdateBoothConfigResponse> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/api/v1/booths/{id}/config',
+            path: {
+                id: data.id
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Assign Device
+     * Assign a device to a booth.
+     * @param data The data for the request.
+     * @param data.id
+     * @param data.requestBody
+     * @returns BoothPublic Successful Response
+     * @throws ApiError
+     */
+    public static assignDevice(data: BoothsAssignDeviceData): CancelablePromise<BoothsAssignDeviceResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/booths/{id}/assign',
+            path: {
+                id: data.id
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Unassign Device
+     * Unassign device from a booth.
+     * @param data The data for the request.
+     * @param data.id
+     * @returns BoothPublic Successful Response
+     * @throws ApiError
+     */
+    public static unassignDevice(data: BoothsUnassignDeviceData): CancelablePromise<BoothsUnassignDeviceResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/booths/{id}/unassign',
+            path: {
+                id: data.id
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
 
 export class ItemsService {
     /**
@@ -205,6 +385,225 @@ export class LoginService {
             url: '/api/v1/password-recovery-html-content/{email}',
             path: {
                 email: data.email
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
+
+export class PaymentsService {
+    /**
+     * Create Payment
+     * Create a new payment via iPaymu and return the QR string.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static createPayment(data: PaymentsCreatePaymentData): CancelablePromise<PaymentsCreatePaymentResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/payments/create',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Check Status
+     * Check the payment status for a given iPaymu transaction.
+     * @param data The data for the request.
+     * @param data.transactionId
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static checkStatus(data: PaymentsCheckStatusData): CancelablePromise<PaymentsCheckStatusResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/payments/status/{transaction_id}',
+            path: {
+                transaction_id: data.transactionId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Payment Notify
+     * Webhook endpoint for iPaymu payment notifications.
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static paymentNotify(): CancelablePromise<PaymentsPaymentNotifyResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/payments/notify'
+        });
+    }
+    
+    /**
+     * Payment Notify Test
+     * Test endpoint (GET) for simulating payment notifications locally.
+     * @param data The data for the request.
+     * @param data.trxId
+     * @param data.status
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static paymentNotifyTest(data: PaymentsPaymentNotifyTestData): CancelablePromise<PaymentsPaymentNotifyTestResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/payments/notify',
+            query: {
+                trx_id: data.trxId,
+                status: data.status
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Create Demo Payment
+     * Create a demo payment that is immediately marked as successful.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static createDemoPayment(data: PaymentsCreateDemoPaymentData): CancelablePromise<PaymentsCreateDemoPaymentResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/payments/demo/create',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
+
+export class PhotoboothAdminService {
+    /**
+     * Get Dashboard Overview
+     * Get dashboard overview stats (superuser only).
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static getDashboardOverview(): CancelablePromise<PhotoboothAdminGetDashboardOverviewResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/photobooth/dashboard/overview'
+        });
+    }
+    
+    /**
+     * Get Recent Transactions
+     * Get recent transactions (superuser only).
+     * @param data The data for the request.
+     * @param data.limit
+     * @returns PaymentPublic Successful Response
+     * @throws ApiError
+     */
+    public static getRecentTransactions(data: PhotoboothAdminGetRecentTransactionsData = {}): CancelablePromise<PhotoboothAdminGetRecentTransactionsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/photobooth/dashboard/recent-transactions',
+            query: {
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Active Sessions
+     * Get active sessions with status 'pending' or 'paid' (superuser only).
+     * @returns KioskSessionPublic Successful Response
+     * @throws ApiError
+     */
+    public static getActiveSessions(): CancelablePromise<PhotoboothAdminGetActiveSessionsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/photobooth/sessions/active'
+        });
+    }
+    
+    /**
+     * Get Recent Sessions
+     * Get recent sessions ordered by created_at descending (superuser only).
+     * @param data The data for the request.
+     * @param data.limit
+     * @returns KioskSessionPublic Successful Response
+     * @throws ApiError
+     */
+    public static getRecentSessions(data: PhotoboothAdminGetRecentSessionsData = {}): CancelablePromise<PhotoboothAdminGetRecentSessionsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/photobooth/sessions/recent',
+            query: {
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Transactions
+     * Get all transactions with optional filters (superuser only).
+     * @param data The data for the request.
+     * @param data.boothId
+     * @param data.status
+     * @param data.startDate
+     * @param data.endDate
+     * @returns PaymentPublic Successful Response
+     * @throws ApiError
+     */
+    public static getTransactions(data: PhotoboothAdminGetTransactionsData = {}): CancelablePromise<PhotoboothAdminGetTransactionsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/photobooth/transactions',
+            query: {
+                booth_id: data.boothId,
+                status: data.status,
+                start_date: data.startDate,
+                end_date: data.endDate
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Revenue Report
+     * Get revenue report aggregated by date (superuser only).
+     * @param data The data for the request.
+     * @param data.startDate Start date for the report
+     * @param data.endDate End date for the report
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static getRevenueReport(data: PhotoboothAdminGetRevenueReportData): CancelablePromise<PhotoboothAdminGetRevenueReportResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/photobooth/reports/revenue',
+            query: {
+                start_date: data.startDate,
+                end_date: data.endDate
             },
             errors: {
                 422: 'Validation Error'

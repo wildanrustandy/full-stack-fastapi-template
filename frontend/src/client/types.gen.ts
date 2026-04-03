@@ -9,6 +9,53 @@ export type Body_login_login_access_token = {
     client_secret?: (string | null);
 };
 
+export type BoothAssignDevice = {
+    device_id: string;
+};
+
+export type BoothConfigUpdate = {
+    price_per_print?: (number | null);
+    timer_default?: (number | null);
+    max_print?: (number | null);
+    filters?: (Array<(string)> | null);
+    payment_timeout?: (number | null);
+};
+
+export type BoothCreate = {
+    name: string;
+    location?: (string | null);
+    is_active?: boolean;
+    config?: ({
+    [key: string]: unknown;
+} | null);
+};
+
+export type BoothPublic = {
+    name: string;
+    location?: (string | null);
+    is_active?: boolean;
+    id: string;
+    device_id?: (string | null);
+    current_session_id?: (string | null);
+    config?: {
+        [key: string]: unknown;
+    };
+    created_at?: (string | null);
+    updated_at?: (string | null);
+    last_active_at?: (string | null);
+};
+
+export type BoothsPublic = {
+    data: Array<BoothPublic>;
+    count: number;
+};
+
+export type BoothUpdate = {
+    name?: (string | null);
+    location?: (string | null);
+    is_active?: (boolean | null);
+};
+
 export type HTTPValidationError = {
     detail?: Array<ValidationError>;
 };
@@ -36,6 +83,19 @@ export type ItemUpdate = {
     description?: (string | null);
 };
 
+export type KioskSessionPublic = {
+    print_count?: number;
+    filter_name?: string;
+    timer?: number;
+    id: string;
+    booth_id: string;
+    device_id: string;
+    status: string;
+    total_price?: (number | null);
+    created_at?: (string | null);
+    completed_at?: (string | null);
+};
+
 export type Message = {
     message: string;
 };
@@ -43,6 +103,29 @@ export type Message = {
 export type NewPassword = {
     token: string;
     new_password: string;
+};
+
+export type PaymentPublic = {
+    amount: number;
+    provider?: string;
+    id: string;
+    session_id: string;
+    booth_id: string;
+    status: string;
+    reference_id?: (string | null);
+    qr_string?: (string | null);
+    transaction_id?: (string | null);
+    paid_at?: (string | null);
+    expires_at?: (string | null);
+    created_at?: (string | null);
+};
+
+export type PaymentRequestBody = {
+    amount: string;
+    product_name?: string;
+    qty?: string;
+    booth_id: string;
+    print_count?: number;
 };
 
 export type PrivateUserCreate = {
@@ -113,6 +196,58 @@ export type ValidationError = {
     };
 };
 
+export type BoothsReadBoothsData = {
+    limit?: number;
+    skip?: number;
+};
+
+export type BoothsReadBoothsResponse = (BoothsPublic);
+
+export type BoothsCreateBoothData = {
+    requestBody: BoothCreate;
+};
+
+export type BoothsCreateBoothResponse = (BoothPublic);
+
+export type BoothsReadBoothData = {
+    id: string;
+};
+
+export type BoothsReadBoothResponse = (BoothPublic);
+
+export type BoothsUpdateBoothData = {
+    id: string;
+    requestBody: BoothUpdate;
+};
+
+export type BoothsUpdateBoothResponse = (BoothPublic);
+
+export type BoothsDeleteBoothData = {
+    id: string;
+};
+
+export type BoothsDeleteBoothResponse = (Message);
+
+export type BoothsUpdateBoothConfigData = {
+    id: string;
+    requestBody: BoothConfigUpdate;
+};
+
+export type BoothsUpdateBoothConfigResponse = (BoothPublic);
+
+export type BoothsAssignDeviceData = {
+    id: string;
+    requestBody: BoothAssignDevice;
+};
+
+export type BoothsAssignDeviceResponse = (BoothPublic);
+
+export type BoothsUnassignDeviceData = {
+    id: string;
+};
+
+export type BoothsUnassignDeviceResponse = (BoothPublic);
+
 export type ItemsReadItemsData = {
     limit?: number;
     skip?: number;
@@ -170,6 +305,75 @@ export type LoginRecoverPasswordHtmlContentData = {
 };
 
 export type LoginRecoverPasswordHtmlContentResponse = (string);
+
+export type PaymentsCreatePaymentData = {
+    requestBody: PaymentRequestBody;
+};
+
+export type PaymentsCreatePaymentResponse = (unknown);
+
+export type PaymentsCheckStatusData = {
+    transactionId: string;
+};
+
+export type PaymentsCheckStatusResponse = (unknown);
+
+export type PaymentsPaymentNotifyResponse = (unknown);
+
+export type PaymentsPaymentNotifyTestData = {
+    status: string;
+    trxId: string;
+};
+
+export type PaymentsPaymentNotifyTestResponse = (unknown);
+
+export type PaymentsCreateDemoPaymentData = {
+    requestBody: PaymentRequestBody;
+};
+
+export type PaymentsCreateDemoPaymentResponse = (unknown);
+
+export type PhotoboothAdminGetDashboardOverviewResponse = ({
+    [key: string]: unknown;
+});
+
+export type PhotoboothAdminGetRecentTransactionsData = {
+    limit?: number;
+};
+
+export type PhotoboothAdminGetRecentTransactionsResponse = (Array<PaymentPublic>);
+
+export type PhotoboothAdminGetActiveSessionsResponse = (Array<KioskSessionPublic>);
+
+export type PhotoboothAdminGetRecentSessionsData = {
+    limit?: number;
+};
+
+export type PhotoboothAdminGetRecentSessionsResponse = (Array<KioskSessionPublic>);
+
+export type PhotoboothAdminGetTransactionsData = {
+    boothId?: (string | null);
+    endDate?: (string | null);
+    startDate?: (string | null);
+    status?: (string | null);
+};
+
+export type PhotoboothAdminGetTransactionsResponse = (Array<PaymentPublic>);
+
+export type PhotoboothAdminGetRevenueReportData = {
+    /**
+     * End date for the report
+     */
+    endDate: string;
+    /**
+     * Start date for the report
+     */
+    startDate: string;
+};
+
+export type PhotoboothAdminGetRevenueReportResponse = (Array<{
+    [key: string]: unknown;
+}>);
 
 export type PrivateCreateUserData = {
     requestBody: PrivateUserCreate;

@@ -94,6 +94,15 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER: EmailStr
     FIRST_SUPERUSER_PASSWORD: str
 
+    # --- Photobooth / iPaymu settings ---
+    IPAYMU_VA: str = ""
+    IPAYMU_KEY: str = ""
+    IPAYMU_URL: str = "https://sandbox.ipaymu.com"
+    IPAYMU_NOTIFY_URL: str = ""
+    DEFAULT_PRICE_PER_PRINT: int = 35000
+    PAYMENT_TIMEOUT_MINUTES: int = 5
+    WS_HEARTBEAT_INTERVAL: int = 30
+
     def _check_default_secret(self, var_name: str, value: str | None) -> None:
         if value == "changethis":
             message = (

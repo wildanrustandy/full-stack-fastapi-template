@@ -1,0 +1,157 @@
+import uuid
+from typing import Any
+
+from fastapi import APIRouter, HTTPException
+from sqlmodel import SQLModel
+
+from app.api.deps import CurrentUser, SessionDep
+from app import crud
+from app.models import (
+    BoothPublic,
+    BoothsPublic,
+    BoothCreate,
+    BoothUpdate,
+    BoothConfigUpdate,
+    Message,
+)
+
+router = APIRouter(prefix="/booths", tags=["booths"])
+
+
+class BoothAssignDevice(SQLModel):
+    device_id: str
+
+
+@router.get("/", response_model=BoothsPublic)
+def read_booths(
+    session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
+) -> Any:
+    """
+    Retrieve booths.
+    """
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    booths = crud.get_booths(session=session, skip=skip, limit=limit)
+    return BoothsPublic(data=booths, count=len(booths))
+
+
+@router.post("/", response_model=BoothPublic)
+def create_booth(
+    *, session: SessionDep, current_user: CurrentUser, booth_in: BoothCreate
+) -> Any:
+    """
+    Create new booth.
+    """
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    booth = crud.create_booth(session=session, booth_in=booth_in)
+    return booth
+
+
+@router.get("/{id}", response_model=BoothPublic)
+def read_booth(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> Any:
+    """
+    Get booth by ID.
+    """
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    booth = crud.get_booth_by_id(session=session, booth_id=id)
+    if not booth:
+        raise HTTPException(status_code=404, detail="Booth not found")
+    return booth
+
+
+@router.put("/{id}", response_model=BoothPublic)
+def update_booth(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    id: uuid.UUID,
+    booth_in: BoothUpdate,
+) -> Any:
+    """
+    Update a booth.
+    """
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    booth = crud.get_booth_by_id(session=session, booth_id=id)
+    if not booth:
+        raise HTTPException(status_code=404, detail="Booth not found")
+    booth = crud.update_booth(session=session, db_booth=booth, booth_in=booth_in)
+    return booth
+
+
+@router.put("/{id}/config", response_model=BoothPublic)
+def update_booth_config(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    id: uuid.UUID,
+    config_in: BoothConfigUpdate,
+) -> Any:
+    """
+    Update booth config.
+    """
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    booth = crud.get_booth_by_id(session=session, booth_id=id)
+    if not booth:
+        raise HTTPException(status_code=404, detail="Booth not found")
+    booth = crud.update_booth_config(
+        session=session, db_booth=booth, config_in=config_in
+    )
+    return booth
+
+
+@router.post("/{id}/assign", response_model=BoothPublic)
+def assign_device(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    id: uuid.UUID,
+    assign_data: BoothAssignDevice,
+) -> Any:
+    """
+    Assign a device to a booth.
+    """
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    booth = crud.assign_device_to_booth(
+        session=session, booth_id=id, device_id=assign_data.device_id
+    )
+    if not booth:
+        raise HTTPException(status_code=404, detail="Booth not found")
+    return booth
+
+
+@router.post("/{id}/unassign", response_model=BoothPublic)
+def unassign_device(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    id: uuid.UUID,
+) -> Any:
+    """
+    Unassign device from a booth.
+    """
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    booth = crud.unassign_device(session=session, booth_id=id)
+    if not booth:
+        raise HTTPException(status_code=404, detail="Booth not found")
+    return booth
+
+
+@router.delete("/{id}")
+def delete_booth(
+    session: SessionDep, current_user: CurrentUser, id: uuid.UUID
+) -> Message:
+    """
+    Delete a booth.
+    """
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    booth = crud.delete_booth(session=session, booth_id=id)
+    if not booth:
+        raise HTTPException(status_code=404, detail="Booth not found")
+    return Message(message="Booth deleted successfully")

@@ -122,3 +122,61 @@
     cursor: pointer;
   }
 }
+
+/* ── Kiosk design system (Material Design 3) ── */
+.kiosk {
+  --k-primary: #a7295a;
+  --k-primary-container: #ff709f;
+  --k-on-primary: #ffffff;
+  --k-secondary: #7d4d5f;
+  --k-secondary-container: #fec1d6;
+  --k-on-secondary-container: #31101f;
+  --k-tertiary: #68575e;
+  --k-tertiary-container: #f1dae2;
+  --k-background: #edf8ff;
+  --k-surface: #edf8ff;
+  --k-surface-container: #dbebf4;
+  --k-surface-container-low: #e5eff7;
+  --k-surface-container-lowest: #f8faff;
+  --k-surface-container-high: #d0e8f2;
+  --k-on-surface: #243036;
+  --k-on-surface-variant: #526068;
+  --k-outline-variant: #c4c6cf;
+  --k-error: #b41340;
+  --k-error-container: #ffdad8;
+
+  font-family: "Be Vietnam Pro", system-ui, sans-serif;
+  background: var(--k-background);
+  color: var(--k-on-surface);
+}
+
+.kiosk .font-headline {
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+.kiosk .font-body {
+  font-family: "Be Vietnam Pro", system-ui, sans-serif;
+}
+
+.kiosk .font-label {
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+.kiosk .material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-variation-settings: "FILL" 1, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+/* Grain texture overlay */
+.bg-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* Scrollbar hide */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
