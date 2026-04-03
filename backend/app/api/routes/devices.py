@@ -101,7 +101,7 @@ def device_heartbeat(
 
 
 @router.post("/assign-by-pin", response_model=BoothPublic)
-def assign_device_by_pin(
+async def assign_device_by_pin(
     *,
     session: SessionDep,
     current_user: CurrentUser,
@@ -139,5 +139,14 @@ def assign_device_by_pin(
 
     if not booth:
         raise HTTPException(status_code=404, detail="Booth not found")
+
+    # Notify device via WebSocket
+    from app.api.routes import websocket
+
+    await websocket.notify_device_assignment(
+        device_id=device_session.device_id,
+        booth_id=str(booth.id),
+        booth_name=booth.name,
+    )
 
     return booth

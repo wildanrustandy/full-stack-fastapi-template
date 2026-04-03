@@ -104,7 +104,7 @@ def update_booth_config(
 
 
 @router.post("/{id}/assign", response_model=BoothPublic)
-def assign_device(
+async def assign_device(
     *,
     session: SessionDep,
     current_user: CurrentUser,
@@ -121,11 +121,19 @@ def assign_device(
     )
     if not booth:
         raise HTTPException(status_code=404, detail="Booth not found")
+
+    # Notify device via WebSocket
+    from app.api.routes import websocket
+
+    await websocket.notify_device_assignment(
+        device_id=assign_data.device_id, booth_id=str(booth.id), booth_name=booth.name
+    )
+
     return booth
 
 
 @router.post("/{id}/unassign", response_model=BoothPublic)
-def unassign_device(
+async def unassign_device(
     *,
     session: SessionDep,
     current_user: CurrentUser,
@@ -136,9 +144,21 @@ def unassign_device(
     """
     if not current_user.is_superuser:
         raise HTTPException(status_code=403, detail="Not enough permissions")
-    booth = crud.unassign_device(session=session, booth_id=id)
+
+    # Get device_id before unassigning
+    booth = session.get(crud.Booth, id)
     if not booth:
         raise HTTPException(status_code=404, detail="Booth not found")
+
+    device_id = booth.device_id
+    booth = crud.unassign_device(session=session, booth_id=id)
+
+    # Notify device via WebSocket
+    if device_id:
+        from app.api.routes import websocket
+
+        await websocket.notify_device_assignment(device_id=device_id, booth_id=None)
+
     return booth
 
 

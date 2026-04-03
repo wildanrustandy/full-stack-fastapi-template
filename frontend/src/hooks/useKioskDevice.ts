@@ -2,6 +2,11 @@ import { useEffect, useState } from "react"
 import { DevicesService } from "@/services/devices"
 
 const STORAGE_KEY = "kiosk_device_id"
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000"
+
+// Singleton WebSocket instance
+let globalWs: WebSocket | null = null
+let globalDeviceId: string | null = null
 
 export function useKioskDevice() {
   const [deviceId, setDeviceId] = useState<string | null>(null)
@@ -10,8 +15,9 @@ export function useKioskDevice() {
   const [isLoading, setIsLoading] = useState(true)
   const [booth, setBooth] = useState<any>(null)
   const [isRegistered, setIsRegistered] = useState(false)
+  const [lastMessage, setLastMessage] = useState<any>(null)
 
-  // Initialize and register device
+  // Initialize device (runs once)
   useEffect(() => {
     const init = async () => {
       // Get or generate device ID
@@ -25,6 +31,7 @@ export function useKioskDevice() {
         localStorage.setItem(STORAGE_KEY, existingId)
       }
       setDeviceId(existingId)
+      globalDeviceId = existingId
 
       // Register device with backend
       try {
@@ -48,7 +55,6 @@ export function useKioskDevice() {
           setIsAssigned(false)
           setBooth(null)
         }
-        // Update PIN from check result in case registration didn't return it
         if (result.pin) {
           setPin(result.pin)
         }
@@ -63,27 +69,104 @@ export function useKioskDevice() {
     init()
   }, [])
 
-  // Poll for assignment status
+  // WebSocket connection (singleton pattern)
   useEffect(() => {
-    if (!deviceId || isAssigned) return
+    if (!deviceId) return
+
+    // Use existing connection if available for same device
+    if (globalWs && globalWs.readyState === WebSocket.OPEN && globalDeviceId === deviceId) {
+      console.log("Using existing WebSocket connection")
+      return
+    }
+
+    // Close existing connection if different device
+    if (globalWs) {
+      globalWs.close()
+      globalWs = null
+    }
+
+    const wsUrl = API_BASE.replace("http://", "ws://").replace("https://", "wss://")
+    const ws = new WebSocket(`${wsUrl}/api/v1/ws/device/${deviceId}`)
+    globalWs = ws
+    globalDeviceId = deviceId
+
+    ws.onopen = () => {
+      console.log("WebSocket connected")
+    }
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        console.log("WebSocket message:", data)
+        setLastMessage(data)
+
+        if (data.type === "assigned") {
+          setIsAssigned(true)
+          setBooth({
+            id: data.booth_id,
+            name: data.booth_name,
+          })
+        } else if (data.type === "unassigned") {
+          setIsAssigned(false)
+          setBooth(null)
+        } else if (data.type === "kicked") {
+          setIsAssigned(false)
+          setBooth(null)
+        }
+      } catch (error) {
+        console.error("Failed to parse WebSocket message:", error)
+      }
+    }
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error)
+    }
+
+    ws.onclose = () => {
+      console.log("WebSocket disconnected")
+      if (globalWs === ws) {
+        globalWs = null
+      }
+    }
+
+    // Heartbeat
+    const heartbeatInterval = setInterval(() => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "ping" }))
+      }
+    }, 30000)
+
+    return () => {
+      clearInterval(heartbeatInterval)
+      // Don't close on unmount - keep connection alive
+    }
+  }, [deviceId])
+
+  // Fallback polling (every 10 seconds)
+  useEffect(() => {
+    if (!deviceId) return
 
     const interval = setInterval(async () => {
       try {
         const result = await DevicesService.checkAssignment(deviceId)
+        
         if (result.is_assigned && result.booth_id) {
           setIsAssigned(true)
           setBooth({
             id: result.booth_id,
             name: result.booth_name,
           })
+        } else {
+          setIsAssigned(false)
+          setBooth(null)
         }
       } catch (error) {
         console.error("Failed to check assignment:", error)
       }
-    }, 5000)
+    }, 10000)
 
     return () => clearInterval(interval)
-  }, [deviceId, isAssigned])
+  }, [deviceId])
 
   return {
     deviceId,
@@ -92,5 +175,6 @@ export function useKioskDevice() {
     isLoading,
     isRegistered,
     booth,
+    lastMessage,
   }
 }

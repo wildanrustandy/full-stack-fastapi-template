@@ -115,3 +115,32 @@ async def kick_device(device_id: str, reason: str = "Device kicked by admin") ->
         finally:
             active_connections.pop(device_id, None)
     return True
+
+
+async def notify_device_assignment(
+    device_id: str, booth_id: str | None, booth_name: str | None = None
+) -> bool:
+    """Notify device about assignment/unassignment change."""
+    if device_id in active_connections:
+        ws = active_connections[device_id]
+        try:
+            if booth_id:
+                await ws.send_json(
+                    {
+                        "type": "assigned",
+                        "booth_id": booth_id,
+                        "booth_name": booth_name,
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                    }
+                )
+            else:
+                await ws.send_json(
+                    {
+                        "type": "unassigned",
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                    }
+                )
+            return True
+        except Exception:
+            pass
+    return False
