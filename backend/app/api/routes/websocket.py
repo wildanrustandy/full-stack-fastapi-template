@@ -5,7 +5,7 @@ from typing import Any
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from sqlmodel import col, select
 
-from app.api.deps import CurrentUserSuperUser, SessionDep
+from app.api.deps import CurrentUser, SessionDep
 from app.models import DeviceSession
 
 logger = logging.getLogger(__name__)
@@ -20,9 +20,9 @@ admin_connections: list[WebSocket] = []
 @router.get("/ws/online-devices")
 def get_online_devices(
     session: SessionDep,
-    _current_user: CurrentUserSuperUser,
+    _current_user: CurrentUser,
 ) -> list[dict[str, Any]]:
-    """Get list of currently connected device IDs (superuser only)."""
+    """Get list of currently connected device IDs."""
     online_device_ids = list(active_connections.keys())
     # Fetch device session info for online devices
     devices: list[dict[str, Any]] = []

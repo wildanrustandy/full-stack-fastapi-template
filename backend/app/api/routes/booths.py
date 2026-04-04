@@ -25,13 +25,11 @@ class BoothAssignDevice(SQLModel):
 
 @router.get("/", response_model=BoothsPublic)
 def read_booths(
-    session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
+    session: SessionDep, _current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
     """
     Retrieve booths.
     """
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
     booths = crud.get_booths(session=session, skip=skip, limit=limit)
     return BoothsPublic(data=booths, count=len(booths))
 
@@ -50,12 +48,10 @@ def create_booth(
 
 
 @router.get("/{id}", response_model=BoothPublic)
-def read_booth(session: SessionDep, current_user: CurrentUser, id: uuid.UUID) -> Any:
+def read_booth(session: SessionDep, _current_user: CurrentUser, id: uuid.UUID) -> Any:
     """
     Get booth by ID.
     """
-    if not current_user.is_superuser:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
     booth = crud.get_booth_by_id(session=session, booth_id=id)
     if not booth:
         raise HTTPException(status_code=404, detail="Booth not found")

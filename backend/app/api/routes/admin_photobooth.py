@@ -7,7 +7,7 @@ from sqlalchemy import func
 from sqlmodel import col, select
 
 from app import crud
-from app.api.deps import CurrentUserSuperUser, SessionDep
+from app.api.deps import CurrentUser, SessionDep
 from app.models import (
     Booth,
     KioskSession,
@@ -26,9 +26,9 @@ class TransactionWithBooth(PaymentPublic):
 @router.get("/dashboard/overview")
 def get_dashboard_overview(
     session: SessionDep,
-    _current_user: CurrentUserSuperUser,
+    _current_user: CurrentUser,
 ) -> dict[str, Any]:
-    """Get dashboard overview stats (superuser only)."""
+    """Get dashboard overview stats."""
 
     # Total sessions
     total_sessions = session.exec(select(func.count()).select_from(KioskSession)).one()
@@ -66,10 +66,10 @@ def get_dashboard_overview(
 @router.get("/dashboard/recent-transactions")
 def get_recent_transactions(
     session: SessionDep,
-    _current_user: CurrentUserSuperUser,
+    _current_user: CurrentUser,
     limit: int = Query(default=10, ge=1, le=100),
 ) -> list[TransactionWithBooth]:
-    """Get recent transactions (superuser only)."""
+    """Get recent transactions."""
     payments = crud.get_transactions(session=session, skip=0, limit=limit)
     result: list[TransactionWithBooth] = []
     for p in payments:
@@ -83,9 +83,9 @@ def get_recent_transactions(
 @router.get("/sessions/active")
 def get_active_sessions(
     session: SessionDep,
-    _current_user: CurrentUserSuperUser,
+    _current_user: CurrentUser,
 ) -> list[KioskSessionPublic]:
-    """Get active sessions with status 'pending' or 'paid' (superuser only)."""
+    """Get active sessions with status 'pending' or 'paid'."""
     statement = (
         select(KioskSession)
         .where(col(KioskSession.status).in_(["pending", "paid"]))
@@ -98,10 +98,10 @@ def get_active_sessions(
 @router.get("/sessions/recent")
 def get_recent_sessions(
     session: SessionDep,
-    _current_user: CurrentUserSuperUser,
+    _current_user: CurrentUser,
     limit: int = Query(default=20, ge=1, le=100),
 ) -> list[KioskSessionPublic]:
-    """Get recent sessions ordered by created_at descending (superuser only)."""
+    """Get recent sessions ordered by created_at descending."""
     statement = (
         select(KioskSession).order_by(col(KioskSession.created_at).desc()).limit(limit)
     )
@@ -112,13 +112,13 @@ def get_recent_sessions(
 @router.get("/transactions")
 def get_transactions(
     session: SessionDep,
-    _current_user: CurrentUserSuperUser,
+    _current_user: CurrentUser,
     booth_id: uuid.UUID | None = None,
     status: str | None = None,
     start_date: datetime | None = None,
     end_date: datetime | None = None,
 ) -> list[PaymentPublic]:
-    """Get all transactions with optional filters (superuser only)."""
+    """Get all transactions with optional filters."""
     payments = crud.get_transactions(
         session=session,
         booth_id=booth_id,
@@ -137,11 +137,11 @@ def get_transactions(
 @router.get("/reports/revenue")
 def get_revenue_report(
     session: SessionDep,
-    _current_user: CurrentUserSuperUser,
+    _current_user: CurrentUser,
     start_date: datetime = Query(..., description="Start date for the report"),
     end_date: datetime = Query(..., description="End date for the report"),
 ) -> list[dict[str, Any]]:
-    """Get revenue report aggregated by date (superuser only)."""
+    """Get revenue report aggregated by date."""
     statement = (
         select(
             func.date(Payment.created_at).label("date"),

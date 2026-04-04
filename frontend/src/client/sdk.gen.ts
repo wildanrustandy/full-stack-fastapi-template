@@ -583,7 +583,7 @@ export class PaymentsService {
 export class PhotoboothAdminService {
     /**
      * Get Dashboard Overview
-     * Get dashboard overview stats (superuser only).
+     * Get dashboard overview stats.
      * @returns unknown Successful Response
      * @throws ApiError
      */
@@ -596,7 +596,7 @@ export class PhotoboothAdminService {
     
     /**
      * Get Recent Transactions
-     * Get recent transactions (superuser only).
+     * Get recent transactions.
      * @param data The data for the request.
      * @param data.limit
      * @returns TransactionWithBooth Successful Response
@@ -617,7 +617,7 @@ export class PhotoboothAdminService {
     
     /**
      * Get Active Sessions
-     * Get active sessions with status 'pending' or 'paid' (superuser only).
+     * Get active sessions with status 'pending' or 'paid'.
      * @returns KioskSessionPublic Successful Response
      * @throws ApiError
      */
@@ -630,7 +630,7 @@ export class PhotoboothAdminService {
     
     /**
      * Get Recent Sessions
-     * Get recent sessions ordered by created_at descending (superuser only).
+     * Get recent sessions ordered by created_at descending.
      * @param data The data for the request.
      * @param data.limit
      * @returns KioskSessionPublic Successful Response
@@ -651,7 +651,7 @@ export class PhotoboothAdminService {
     
     /**
      * Get Transactions
-     * Get all transactions with optional filters (superuser only).
+     * Get all transactions with optional filters.
      * @param data The data for the request.
      * @param data.boothId
      * @param data.status
@@ -678,7 +678,7 @@ export class PhotoboothAdminService {
     
     /**
      * Get Revenue Report
-     * Get revenue report aggregated by date (superuser only).
+     * Get revenue report aggregated by date.
      * @param data The data for the request.
      * @param data.startDate Start date for the report
      * @param data.endDate End date for the report
@@ -1021,7 +1021,7 @@ export class UtilsService {
 export class WebsocketService {
     /**
      * Get Online Devices
-     * Get list of currently connected device IDs (superuser only).
+     * Get list of currently connected device IDs.
      * @returns unknown Successful Response
      * @throws ApiError
      */
