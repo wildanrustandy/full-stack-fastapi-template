@@ -174,6 +174,22 @@ export type Token = {
     token_type?: string;
 };
 
+export type TransactionWithBooth = {
+    amount: number;
+    provider?: string;
+    id: string;
+    session_id: string;
+    booth_id: string;
+    status: string;
+    reference_id?: (string | null);
+    qr_string?: (string | null);
+    transaction_id?: (string | null);
+    paid_at?: (string | null);
+    expires_at?: (string | null);
+    created_at?: (string | null);
+    booth_name?: string;
+};
+
 export type UpdatePassword = {
     current_password: string;
     new_password: string;
@@ -405,7 +421,7 @@ export type PhotoboothAdminGetRecentTransactionsData = {
     limit?: number;
 };
 
-export type PhotoboothAdminGetRecentTransactionsResponse = (Array<PaymentPublic>);
+export type PhotoboothAdminGetRecentTransactionsResponse = (Array<TransactionWithBooth>);
 
 export type PhotoboothAdminGetActiveSessionsResponse = (Array<KioskSessionPublic>);
 

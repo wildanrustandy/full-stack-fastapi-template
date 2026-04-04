@@ -19,6 +19,10 @@ from app.models import (
 router = APIRouter(prefix="/photobooth", tags=["photobooth-admin"])
 
 
+class TransactionWithBooth(PaymentPublic):
+    booth_name: str = "Unknown Booth"
+
+
 @router.get("/dashboard/overview")
 def get_dashboard_overview(
     session: SessionDep,
@@ -64,10 +68,16 @@ def get_recent_transactions(
     session: SessionDep,
     _current_user: CurrentUserSuperUser,
     limit: int = Query(default=10, ge=1, le=100),
-) -> list[PaymentPublic]:
+) -> list[TransactionWithBooth]:
     """Get recent transactions (superuser only)."""
     payments = crud.get_transactions(session=session, skip=0, limit=limit)
-    return [PaymentPublic.model_validate(p) for p in payments]
+    result: list[TransactionWithBooth] = []
+    for p in payments:
+        booth = session.get(Booth, p.booth_id) if p.booth_id else None
+        item = TransactionWithBooth.model_validate(p)
+        item.booth_name = booth.name if booth else "Unknown Booth"
+        result.append(item)
+    return result
 
 
 @router.get("/sessions/active")

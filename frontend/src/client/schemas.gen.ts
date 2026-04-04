@@ -945,6 +945,117 @@ export const TokenSchema = {
     title: 'Token'
 } as const;
 
+export const TransactionWithBoothSchema = {
+    properties: {
+        amount: {
+            type: 'number',
+            title: 'Amount'
+        },
+        provider: {
+            type: 'string',
+            maxLength: 50,
+            title: 'Provider',
+            default: 'qris'
+        },
+        id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Id'
+        },
+        session_id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Session Id'
+        },
+        booth_id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Booth Id'
+        },
+        status: {
+            type: 'string',
+            title: 'Status'
+        },
+        reference_id: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Reference Id'
+        },
+        qr_string: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Qr String'
+        },
+        transaction_id: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Transaction Id'
+        },
+        paid_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Paid At'
+        },
+        expires_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Expires At'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        },
+        booth_name: {
+            type: 'string',
+            title: 'Booth Name',
+            default: 'Unknown Booth'
+        }
+    },
+    type: 'object',
+    required: ['amount', 'id', 'session_id', 'booth_id', 'status'],
+    title: 'TransactionWithBooth'
+} as const;
+
 export const UpdatePasswordSchema = {
     properties: {
         current_password: {

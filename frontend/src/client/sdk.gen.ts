@@ -599,7 +599,7 @@ export class PhotoboothAdminService {
      * Get recent transactions (superuser only).
      * @param data The data for the request.
      * @param data.limit
-     * @returns PaymentPublic Successful Response
+     * @returns TransactionWithBooth Successful Response
      * @throws ApiError
      */
     public static getRecentTransactions(data: PhotoboothAdminGetRecentTransactionsData = {}): CancelablePromise<PhotoboothAdminGetRecentTransactionsResponse> {
