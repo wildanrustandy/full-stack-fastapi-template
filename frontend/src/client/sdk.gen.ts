@@ -504,7 +504,7 @@ export class PaymentsService {
     
     /**
      * Check Status
-     * Check the payment status for a given iPaymu transaction.
+     * Check payment status. Checks local DB first, then iPaymu.
      * @param data The data for the request.
      * @param data.transactionId
      * @returns unknown Successful Response

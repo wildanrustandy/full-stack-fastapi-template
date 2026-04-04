@@ -1,4 +1,5 @@
 import json
+import logging
 import urllib.parse
 import uuid
 from datetime import datetime, timedelta, timezone
@@ -12,6 +13,8 @@ from app.api.deps import SessionDep
 from app.core.config import settings
 from app.models import KioskSessionCreate, KioskSessionUpdate, PaymentCreate
 from app.services import ipaymu
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
@@ -30,12 +33,40 @@ class PaymentRequestBody(SQLModel):
 
 
 # ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+async def _broadcast_transaction(payment: Any, booth_name: str) -> None:
+    """Broadcast transaction update to admin WebSocket clients."""
+    from app.api.routes import websocket
+
+    await websocket.broadcast_transaction_update(
+        {
+            "id": str(payment.id),
+            "session_id": str(payment.session_id),
+            "reference_id": payment.reference_id,
+            "transaction_id": payment.transaction_id,
+            "booth_id": str(payment.booth_id),
+            "booth_name": booth_name,
+            "amount": float(payment.amount),
+            "status": payment.status,
+            "provider": payment.provider,
+            "created_at": payment.created_at.isoformat()
+            if payment.created_at
+            else None,
+            "paid_at": payment.paid_at.isoformat() if payment.paid_at else None,
+        }
+    )
+
+
+# ---------------------------------------------------------------------------
 # Routes
 # ---------------------------------------------------------------------------
 
 
 @router.post("/create")
-def create_payment(body: PaymentRequestBody, session: SessionDep) -> Any:
+async def create_payment(body: PaymentRequestBody, session: SessionDep) -> Any:
     """Create a new payment via iPaymu and return the QR string."""
     # 1. Create kiosk session
     session_create = KioskSessionCreate(
@@ -66,9 +97,13 @@ def create_payment(body: PaymentRequestBody, session: SessionDep) -> Any:
     qr_string = ipaymu_data.get("Data", {}).get("QrString") or ipaymu_data.get(
         "QrString", ""
     )
-    transaction_id = ipaymu_data.get("Data", {}).get(
-        "TransactionId"
-    ) or ipaymu_data.get("TransactionId", "")
+    transaction_id = str(
+        ipaymu_data.get("Data", {}).get("TransactionId")
+        or ipaymu_data.get("TransactionId", "")
+    )
+    qr_image_url = ipaymu_data.get("Data", {}).get("QrImage") or ipaymu_data.get(
+        "QrImage", ""
+    )
     expires_at = datetime.now(timezone.utc) + timedelta(
         minutes=settings.PAYMENT_TIMEOUT_MINUTES
     )
@@ -88,8 +123,14 @@ def create_payment(body: PaymentRequestBody, session: SessionDep) -> Any:
         expires_at=expires_at,
     )
 
+    # Broadcast transaction creation to admin clients
+    booth = crud.get_booth_by_id(session=session, booth_id=body.booth_id)
+    booth_name = booth.name if booth else "Unknown"
+    await _broadcast_transaction(payment, booth_name)
+
     return {
         "QrString": payment.qr_string,
+        "QrImage": qr_image_url,
         "TransactionId": payment.transaction_id,
         "ReferenceId": payment.reference_id,
         "SessionId": str(kiosk_session.id),
@@ -97,17 +138,34 @@ def create_payment(body: PaymentRequestBody, session: SessionDep) -> Any:
 
 
 @router.get("/status/{transaction_id}")
-def check_status(transaction_id: str) -> Any:
-    """Check the payment status for a given iPaymu transaction."""
+def check_status(transaction_id: str, session: SessionDep) -> Any:
+    """Check payment status. Checks local DB first, then iPaymu."""
+    # Check our DB first (updated by webhook)
+    payment = crud.get_payment_by_transaction_id(
+        session=session, transaction_id=transaction_id
+    )
+    if payment:
+        return {
+            "Status": payment.status,
+            "TransactionId": payment.transaction_id,
+            "ReferenceId": payment.reference_id,
+            "SessionId": str(payment.session_id),
+        }
+
+    # Fallback to iPaymu API
     result = ipaymu.check_payment_status(transaction_id)
     return result
 
 
-def _handle_notification(session: SessionDep, trx_id: str, status: str) -> dict:
+async def _handle_notification(session: SessionDep, trx_id: str, status: str) -> dict:
     """Shared logic for processing payment notifications (POST and GET)."""
     payment = crud.get_payment_by_transaction_id(session=session, transaction_id=trx_id)
     if not payment:
         raise HTTPException(status_code=404, detail="Payment not found")
+
+    # Capture IDs before any commits expire them
+    booth_id = payment.booth_id
+    session_id = payment.session_id
 
     if status.lower() in ("berhasil", "1"):
         now = datetime.now(timezone.utc)
@@ -115,17 +173,49 @@ def _handle_notification(session: SessionDep, trx_id: str, status: str) -> dict:
             session=session, db_payment=payment, status="success", paid_at=now
         )
         # Also update the linked kiosk session
-        kiosk_session = crud.get_kiosk_session(
-            session=session, session_id=payment.session_id
-        )
+        kiosk_session = crud.get_kiosk_session(session=session, session_id=session_id)
         if kiosk_session:
             crud.update_kiosk_session(
                 session=session,
                 db_session=kiosk_session,
                 session_in=KioskSessionUpdate(status="paid"),
             )
+
+        # Notify kiosk device that payment succeeded
+        if booth_id:
+            booth = crud.get_booth_by_id(session=session, booth_id=booth_id)
+            if booth and booth.device_id:
+                from app.api.routes import websocket
+
+                logger.info(
+                    "Payment success: notifying device %s (connections: %s)",
+                    booth.device_id,
+                    list(websocket.active_connections.keys()),
+                )
+                if booth.device_id in websocket.active_connections:
+                    ws = websocket.active_connections[booth.device_id]
+                    await ws.send_json(
+                        {
+                            "type": "payment_success",
+                            "session_id": str(session_id),
+                            "timestamp": datetime.now(timezone.utc).isoformat(),
+                        }
+                    )
+                    logger.info("Sent payment_success to device %s", booth.device_id)
+                else:
+                    logger.warning(
+                        "Device %s not in active WebSocket connections", booth.device_id
+                    )
+
     elif status.lower() in ("expired", "-2", "2"):
         crud.update_payment_status(session=session, db_payment=payment, status="failed")
+
+    # Broadcast transaction update to admin clients
+    booth = (
+        crud.get_booth_by_id(session=session, booth_id=booth_id) if booth_id else None
+    )
+    booth_name = booth.name if booth else "Unknown"
+    await _broadcast_transaction(payment, booth_name)
 
     return {"status": "success", "trx_id": trx_id}
 
@@ -154,21 +244,21 @@ async def payment_notify(request: Request, session: SessionDep) -> Any:
     if not trx_id or not status:
         raise HTTPException(status_code=400, detail="Missing trx_id or status")
 
-    return _handle_notification(session=session, trx_id=trx_id, status=status)
+    return await _handle_notification(session=session, trx_id=trx_id, status=status)
 
 
 @router.get("/notify")
-def payment_notify_test(
+async def payment_notify_test(
     session: SessionDep,
     trx_id: str = Query(...),
     status: str = Query(...),
 ) -> Any:
     """Test endpoint (GET) for simulating payment notifications locally."""
-    return _handle_notification(session=session, trx_id=trx_id, status=status)
+    return await _handle_notification(session=session, trx_id=trx_id, status=status)
 
 
 @router.post("/demo/create")
-def create_demo_payment(body: PaymentRequestBody, session: SessionDep) -> Any:
+async def create_demo_payment(body: PaymentRequestBody, session: SessionDep) -> Any:
     """Create a demo payment that is immediately marked as successful."""
     # Ensure demo booth exists (auto-creates if missing)
     demo_booth = crud.ensure_demo_booth(session=session)
@@ -218,6 +308,9 @@ def create_demo_payment(body: PaymentRequestBody, session: SessionDep) -> Any:
         db_session=kiosk_session,
         session_in=KioskSessionUpdate(status="paid"),
     )
+
+    # Broadcast to admin
+    await _broadcast_transaction(payment, demo_booth.name)
 
     return {
         "QrString": payment.qr_string,

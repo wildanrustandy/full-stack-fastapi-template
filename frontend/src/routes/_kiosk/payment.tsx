@@ -1,13 +1,16 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import QRCode from "qrcode"
 import { useCallback, useEffect, useState } from "react"
 import { z } from "zod"
 import BoothNameHeader from "@/components/Kiosk/BoothNameHeader"
 import CountdownTimer from "@/components/Kiosk/CountdownTimer"
 import ProgressIndicator from "@/components/Kiosk/ProgressIndicator"
 import QRDisplay from "@/components/Kiosk/QRDisplay"
+import { useKioskDevice } from "@/hooks/useKioskDevice"
 import {
   useCheckPaymentStatus,
   useCreateDemoPayment,
+  useCreatePayment,
 } from "@/hooks/usePhotobooth"
 
 const paymentSearchSchema = z.object({
@@ -35,17 +38,64 @@ function formatCountdown(seconds: number): string {
 }
 
 const COUNTDOWN_SECONDS = 5 * 60 // 5 minutes
+const IS_DEMO_MODE = import.meta.env.VITE_DEMO_PAYMENT === "true"
+
+interface PaymentCache {
+  transactionId: string
+  sessionId: string
+  referenceId: string
+  qrCodeUrl: string | null
+  createdAt: number // timestamp
+  boothId: string
+  amount: number
+  printCount: number
+}
+
+function getPaymentCacheKey(
+  boothId: string,
+  amount: number,
+  printCount: number,
+) {
+  return `payment_${boothId}_${amount}_${printCount}`
+}
+
+function getPaymentCache(key: string): PaymentCache | null {
+  try {
+    const raw = sessionStorage.getItem(key)
+    if (!raw) return null
+    const cache: PaymentCache = JSON.parse(raw)
+    // Expire after 5 minutes
+    if (Date.now() - cache.createdAt > COUNTDOWN_SECONDS * 1000) {
+      sessionStorage.removeItem(key)
+      return null
+    }
+    return cache
+  } catch {
+    return null
+  }
+}
+
+function setPaymentCache(key: string, cache: PaymentCache) {
+  sessionStorage.setItem(key, JSON.stringify(cache))
+}
+
+function clearPaymentCache(key: string) {
+  sessionStorage.removeItem(key)
+}
 
 function PaymentPage() {
   const navigate = useNavigate()
   const search = Route.useSearch()
   const { printCount, amount } = search
+  const { booth, lastMessage } = useKioskDevice()
+  const createPayment = useCreatePayment()
   const createDemoPayment = useCreateDemoPayment()
+  const boothId = booth?.id
 
   const [transactionId, setTransactionId] = useState<string | null>(null)
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [referenceId, setReferenceId] = useState<string | null>(null)
-  const [qrCodeUrl] = useState<string | null>(null)
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null)
   const [paymentStatus, setPaymentStatus] = useState<
     "pending" | "success" | "failed"
   >("pending")
@@ -61,6 +111,20 @@ function PaymentPage() {
       setPaymentStatus("success")
     }
   }, [status])
+
+  // Watch for payment_success from WebSocket
+  useEffect(() => {
+    if (
+      lastMessage?.type === "payment_success" &&
+      paymentStatus === "pending"
+    ) {
+      console.log("Payment success received via WebSocket")
+      setPaymentStatus("success")
+      if (lastMessage.session_id) {
+        setSessionId(lastMessage.session_id)
+      }
+    }
+  }, [lastMessage, paymentStatus])
 
   // Countdown timer
   useEffect(() => {
@@ -80,6 +144,11 @@ function PaymentPage() {
   // Auto-navigate on success
   useEffect(() => {
     if (paymentStatus === "success") {
+      // Clear payment cache
+      if (boothId) {
+        const cacheKey = getPaymentCacheKey(boothId, amount, printCount || 1)
+        clearPaymentCache(cacheKey)
+      }
       const timeout = setTimeout(() => {
         navigate({
           to: "/photo-session",
@@ -89,40 +158,109 @@ function PaymentPage() {
       return () => clearTimeout(timeout)
     }
     if (paymentStatus === "failed") {
+      // Clear payment cache
+      if (boothId) {
+        const cacheKey = getPaymentCacheKey(boothId, amount, printCount || 1)
+        clearPaymentCache(cacheKey)
+      }
       const timeout = setTimeout(() => {
         navigate({ to: "/landing" })
       }, 3000)
       return () => clearTimeout(timeout)
     }
-  }, [paymentStatus, sessionId, navigate])
+  }, [paymentStatus, sessionId, navigate, boothId, amount, printCount])
 
-  const handleDemoPayment = useCallback(async () => {
+  const handlePayment = useCallback(async () => {
+    if (!boothId) {
+      setError("Booth tidak ditemukan. Kembali ke halaman utama.")
+      return
+    }
     setIsLoading(true)
     setError(null)
     try {
-      const result = (await createDemoPayment.mutateAsync({
-        amount: String(amount),
-        booth_id: "00000000-0000-0000-0000-000000000001",
-        print_count: printCount || 1,
-        product_name: "Photobooth Session",
-      })) as any
-      setTransactionId(result.TransactionId)
-      setSessionId(result.SessionId)
-      setReferenceId(result.ReferenceId)
-      // Demo payment is immediately successful
-      setPaymentStatus("success")
+      if (IS_DEMO_MODE) {
+        // Demo: immediately successful, no real QR
+        const result = (await createDemoPayment.mutateAsync({
+          amount: String(amount),
+          booth_id: boothId,
+          print_count: printCount || 1,
+          product_name: "Photobooth Session",
+        })) as any
+        setTransactionId(result.TransactionId)
+        setSessionId(result.SessionId)
+        setReferenceId(result.ReferenceId)
+        setPaymentStatus("success")
+      } else {
+        // Real iPaymu payment
+        const result = (await createPayment.mutateAsync({
+          amount: String(amount),
+          booth_id: boothId,
+          print_count: printCount || 1,
+          product_name: "Photobooth Session",
+        })) as any
+        setTransactionId(result.TransactionId)
+        setSessionId(result.SessionId)
+        setReferenceId(result.ReferenceId)
+
+        // Generate QR code image from iPaymu QrString (raw QRIS data)
+        const qrString = result.QrString || ""
+        let qrDataUrl: string | null = null
+        if (qrString) {
+          qrDataUrl = await QRCode.toDataURL(qrString, {
+            width: 400,
+            margin: 2,
+            color: { dark: "#000000", light: "#ffffff" },
+          })
+          setQrCodeUrl(qrDataUrl)
+        }
+
+        // Cache payment details for refresh recovery
+        const cacheKey = getPaymentCacheKey(boothId, amount, printCount || 1)
+        setPaymentCache(cacheKey, {
+          transactionId: result.TransactionId,
+          sessionId: result.SessionId,
+          referenceId: result.ReferenceId,
+          qrCodeUrl: qrDataUrl,
+          createdAt: Date.now(),
+          boothId,
+          amount,
+          printCount: printCount || 1,
+        })
+        // Payment stays "pending" — status will be updated by polling/webhook
+      }
     } catch {
       setError("Gagal membuat pembayaran. Coba lagi.")
     } finally {
       setIsLoading(false)
     }
-  }, [amount, printCount, createDemoPayment])
+  }, [amount, boothId, printCount, createPayment, createDemoPayment])
 
-  // Auto-create payment on mount (demo mode)
+  // On mount: restore from cache or create new payment
   useEffect(() => {
-    handleDemoPayment()
+    if (!boothId) return
+
+    const cacheKey = getPaymentCacheKey(boothId, amount, printCount || 1)
+    const cached = getPaymentCache(cacheKey)
+
+    if (cached) {
+      // Restore from cache — no new API call
+      setTransactionId(cached.transactionId)
+      setSessionId(cached.sessionId)
+      setReferenceId(cached.referenceId)
+      setQrCodeUrl(cached.qrCodeUrl)
+      // Calculate remaining countdown
+      const elapsed = Math.floor((Date.now() - cached.createdAt) / 1000)
+      const remaining = Math.max(COUNTDOWN_SECONDS - elapsed, 0)
+      setCountdown(remaining)
+      if (remaining <= 0) {
+        setPaymentStatus("failed")
+        clearPaymentCache(cacheKey)
+      }
+    } else {
+      handlePayment()
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [handleDemoPayment])
+  }, [boothId, amount, handlePayment, printCount])
 
   return (
     <div
@@ -319,8 +457,8 @@ function PaymentPage() {
               qrCodeUrl={qrCodeUrl}
               isLoading={isLoading}
               error={error}
-              isDemo={true}
-              onRetry={handleDemoPayment}
+              isDemo={IS_DEMO_MODE}
+              onRetry={handlePayment}
             />
           </div>
         </div>

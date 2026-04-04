@@ -166,6 +166,12 @@ export function useKioskDevice() {
           setBooth(null)
           setUnassignedReason(data.reason || "Disconnected by admin")
           setIsInactiveBooth(false)
+        } else if (data.type === "payment_success") {
+          console.log(
+            "Payment success via WebSocket, session_id:",
+            data.session_id,
+          )
+          setLastMessage(data)
         }
       } catch (error) {
         console.error("Failed to parse WebSocket message:", error)
