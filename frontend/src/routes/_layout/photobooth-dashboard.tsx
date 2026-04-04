@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import {
   Activity,
   BarChart3,
@@ -16,7 +16,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
-import { UsersService } from "@/client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   Select,
@@ -33,12 +33,6 @@ import {
 
 export const Route = createFileRoute("/_layout/photobooth-dashboard")({
   component: PhotoboothDashboard,
-  beforeLoad: async () => {
-    const user = await UsersService.readUserMe()
-    if (!user.is_superuser) {
-      throw redirect({ to: "/" })
-    }
-  },
   head: () => ({
     meta: [{ title: "Photobooth Dashboard - FastAPI Template" }],
   }),

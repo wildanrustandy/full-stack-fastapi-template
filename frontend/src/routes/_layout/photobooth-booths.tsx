@@ -1,7 +1,6 @@
-import { createFileRoute, redirect } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { MapPin, Monitor, Plus, Settings, Trash2, X } from "lucide-react"
 import { Suspense, useState } from "react"
-import { UsersService } from "@/client"
 import { AssignDeviceByPinDialog } from "@/components/Booths/AssignDeviceByPinDialog"
 import { EditBoothDialog } from "@/components/Booths/EditBoothDialog"
 import { Badge } from "@/components/ui/badge"
@@ -29,12 +28,6 @@ import {
 
 export const Route = createFileRoute("/_layout/photobooth-booths")({
   component: PhotoboothBooths,
-  beforeLoad: async () => {
-    const user = await UsersService.readUserMe()
-    if (!user.is_superuser) {
-      throw redirect({ to: "/" })
-    }
-  },
   head: () => ({ meta: [{ title: "Booths - FastAPI Template" }] }),
 })
 

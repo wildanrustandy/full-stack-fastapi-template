@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
-import { createFileRoute, redirect } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { useMemo, useState } from "react"
-import { PhotoboothAdminService, UsersService } from "@/client"
+import { PhotoboothAdminService } from "@/client"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -25,12 +25,6 @@ import { useBooths } from "@/hooks/usePhotobooth"
 
 export const Route = createFileRoute("/_layout/photobooth-transactions")({
   component: PhotoboothTransactions,
-  beforeLoad: async () => {
-    const user = await UsersService.readUserMe()
-    if (!user.is_superuser) {
-      throw redirect({ to: "/" })
-    }
-  },
   head: () => ({ meta: [{ title: "Transactions - FastAPI Template" }] }),
 })
 
