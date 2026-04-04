@@ -46,6 +46,13 @@ export const Route = createFileRoute("/_layout/photobooth-dashboard")({
 
 type DateRange = "7days" | "30days" | "thisMonth"
 
+function toLocalDateStr(d: Date): string {
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, "0")
+  const day = String(d.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
+}
+
 function getDateRange(range: DateRange): {
   startDate: string
   endDate: string
@@ -69,8 +76,8 @@ function getDateRange(range: DateRange): {
   }
 
   return {
-    startDate: start.toISOString().split("T")[0],
-    endDate: end.toISOString().split("T")[0],
+    startDate: `${toLocalDateStr(start)}T00:00:00`,
+    endDate: `${toLocalDateStr(end)}T23:59:59`,
   }
 }
 
