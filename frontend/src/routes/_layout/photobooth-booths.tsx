@@ -23,6 +23,7 @@ import {
   useBooths,
   useCreateBooth,
   useDeleteBooth,
+  useOnlineDevices,
   useUnassignDevice,
 } from "@/hooks/usePhotobooth"
 
@@ -37,7 +38,15 @@ export const Route = createFileRoute("/_layout/photobooth-booths")({
   head: () => ({ meta: [{ title: "Booths - FastAPI Template" }] }),
 })
 
-function BoothCard({ booth }: { booth: any }) {
+function BoothCard({
+  booth,
+  isOnline,
+  onlineDeviceId,
+}: {
+  booth: any
+  isOnline: boolean
+  onlineDeviceId?: string
+}) {
   const { showSuccessToast, showErrorToast } = useCustomToast()
   const deleteBooth = useDeleteBooth()
   const unassignDevice = useUnassignDevice()
@@ -100,7 +109,38 @@ function BoothCard({ booth }: { booth: any }) {
 
           {booth.device_id ? (
             <div className="flex items-center justify-between bg-muted rounded-md p-2">
-              <code className="text-xs">{booth.device_id}</code>
+              <div className="flex flex-col gap-1">
+                <code className="text-xs">{booth.device_id}</code>
+                {isOnline ? (
+                  <div className="flex items-center gap-1.5">
+                    <span className="relative flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+                    </span>
+                    <Badge
+                      variant="default"
+                      className="bg-green-100 text-green-700 hover:bg-green-100 text-[10px] px-1.5 py-0"
+                    >
+                      Online
+                    </Badge>
+                    {onlineDeviceId && (
+                      <span className="text-[10px] text-muted-foreground">
+                        {onlineDeviceId}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-flex rounded-full h-2.5 w-2.5 bg-gray-300" />
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] px-1.5 py-0"
+                    >
+                      Offline
+                    </Badge>
+                  </div>
+                )}
+              </div>
               <Button
                 variant="ghost"
                 size="sm"
@@ -127,6 +167,7 @@ function BoothsContent() {
   useAdminWebSocket()
 
   const { data: boothsData } = useBooths()
+  const { data: onlineDevices } = useOnlineDevices()
   const createBooth = useCreateBooth()
   const { showSuccessToast } = useCustomToast()
   const [open, setOpen] = useState(false)
@@ -134,6 +175,16 @@ function BoothsContent() {
   const [location, setLocation] = useState("")
 
   const booths = (boothsData as any)?.data ?? boothsData ?? []
+
+  // Build a set of booth IDs that have online devices
+  const onlineBoothIds = new Map<string, string>()
+  if (Array.isArray(onlineDevices)) {
+    for (const device of onlineDevices) {
+      if (device.booth_id) {
+        onlineBoothIds.set(device.booth_id, device.device_id)
+      }
+    }
+  }
 
   const handleCreate = async () => {
     await createBooth.mutateAsync({ name, location: location || undefined })
@@ -196,9 +247,17 @@ function BoothsContent() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {Array.isArray(booths) &&
-          booths.map((booth: any) => (
-            <BoothCard key={booth.id} booth={booth} />
-          ))}
+          booths.map((booth: any) => {
+            const onlineDeviceId = onlineBoothIds.get(booth.id)
+            return (
+              <BoothCard
+                key={booth.id}
+                booth={booth}
+                isOnline={!!onlineDeviceId}
+                onlineDeviceId={onlineDeviceId}
+              />
+            )
+          })}
       </div>
 
       {(!Array.isArray(booths) || booths.length === 0) && (

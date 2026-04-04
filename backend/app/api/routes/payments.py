@@ -157,7 +157,9 @@ def check_status(transaction_id: str, session: SessionDep) -> Any:
     return result
 
 
-async def _handle_notification(session: SessionDep, trx_id: str, status: str) -> dict:
+async def _handle_notification(
+    session: SessionDep, trx_id: str, status: str
+) -> dict[str, Any]:
     """Shared logic for processing payment notifications (POST and GET)."""
     payment = crud.get_payment_by_transaction_id(session=session, transaction_id=trx_id)
     if not payment:

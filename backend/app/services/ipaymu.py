@@ -2,6 +2,7 @@ import hashlib
 import hmac
 import json
 from datetime import datetime
+from typing import Any
 
 import httpx
 from fastapi import HTTPException
@@ -22,12 +23,12 @@ def generate_signature(body: str, va: str, api_key: str) -> tuple[str, str]:
 
 
 def create_payment_request(
-    session,  # noqa: ARG001
+    session: Any,  # noqa: ARG001
     amount: float,
     product_name: str,
     print_count: int,  # noqa: ARG001
     notify_url: str,
-) -> dict:
+) -> dict[str, Any]:
     reference_id = "PB" + datetime.now().strftime("%Y%m%d%H%M%S")
 
     body = {
@@ -67,7 +68,7 @@ def create_payment_request(
     return {"data": response.json(), "reference_id": reference_id}
 
 
-def check_payment_status(transaction_id: str) -> dict:
+def check_payment_status(transaction_id: str) -> dict[str, Any]:
     body = {"transactionId": transaction_id}
     data_body = json.dumps(body, separators=(",", ":"))
 
@@ -92,4 +93,5 @@ def check_payment_status(transaction_id: str) -> dict:
     if response.status_code != 200:
         raise HTTPException(status_code=400, detail="iPaymu status check failed")
 
-    return response.json().get("Data", {})
+    data: dict[str, Any] = response.json().get("Data", {})
+    return data

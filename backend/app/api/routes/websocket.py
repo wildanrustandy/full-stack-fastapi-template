@@ -1,7 +1,12 @@
 import logging
 from datetime import datetime, timezone
+from typing import Any
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from sqlmodel import col, select
+
+from app.api.deps import CurrentUserSuperUser, SessionDep
+from app.models import DeviceSession
 
 logger = logging.getLogger(__name__)
 
@@ -10,6 +15,34 @@ router = APIRouter(tags=["websocket"])
 # Module-level connection stores
 active_connections: dict[str, WebSocket] = {}
 admin_connections: list[WebSocket] = []
+
+
+@router.get("/ws/online-devices")
+def get_online_devices(
+    session: SessionDep,
+    _current_user: CurrentUserSuperUser,
+) -> list[dict[str, Any]]:
+    """Get list of currently connected device IDs (superuser only)."""
+    online_device_ids = list(active_connections.keys())
+    # Fetch device session info for online devices
+    devices: list[dict[str, Any]] = []
+    if online_device_ids:
+        statement = select(DeviceSession).where(
+            col(DeviceSession.device_id).in_(online_device_ids)
+        )
+        results = session.exec(statement).all()
+        for d in results:
+            devices.append(
+                {
+                    "device_id": d.device_id,
+                    "device_name": d.device_name,
+                    "booth_id": str(d.booth_id) if d.booth_id else None,
+                    "last_heartbeat": d.last_heartbeat.isoformat()
+                    if d.last_heartbeat
+                    else None,
+                }
+            )
+    return devices
 
 
 @router.websocket("/ws/device/{device_id}")
@@ -83,7 +116,7 @@ async def admin_websocket(websocket: WebSocket) -> None:
             admin_connections.remove(websocket)
 
 
-async def broadcast_transaction_update(transaction_data: dict) -> None:
+async def broadcast_transaction_update(transaction_data: dict[str, Any]) -> None:
     message = {
         "type": "transaction_update",
         "data": transaction_data,
@@ -124,7 +157,7 @@ async def notify_device_assignment(
     booth_id: str | None,
     booth_name: str | None = None,
     booth_location: str | None = None,
-    booth_config: dict | None = None,
+    booth_config: dict[str, Any] | None = None,
     booth_active: bool = True,
     reason: str | None = None,
 ) -> bool:

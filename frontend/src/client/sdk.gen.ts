@@ -3,7 +3,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { BoothsReadBoothsData, BoothsReadBoothsResponse, BoothsCreateBoothData, BoothsCreateBoothResponse, BoothsReadBoothData, BoothsReadBoothResponse, BoothsUpdateBoothData, BoothsUpdateBoothResponse, BoothsDeleteBoothData, BoothsDeleteBoothResponse, BoothsUpdateBoothConfigData, BoothsUpdateBoothConfigResponse, BoothsAssignDeviceData, BoothsAssignDeviceResponse, BoothsUnassignDeviceData, BoothsUnassignDeviceResponse, DevicesRegisterDeviceData, DevicesRegisterDeviceResponse, DevicesCheckDeviceAssignmentData, DevicesCheckDeviceAssignmentResponse, DevicesDeviceHeartbeatData, DevicesDeviceHeartbeatResponse, DevicesAssignDeviceByPinData, DevicesAssignDeviceByPinResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PaymentsCreatePaymentData, PaymentsCreatePaymentResponse, PaymentsCheckStatusData, PaymentsCheckStatusResponse, PaymentsPaymentNotifyResponse, PaymentsPaymentNotifyTestData, PaymentsPaymentNotifyTestResponse, PaymentsCreateDemoPaymentData, PaymentsCreateDemoPaymentResponse, PhotoboothAdminGetDashboardOverviewResponse, PhotoboothAdminGetRecentTransactionsData, PhotoboothAdminGetRecentTransactionsResponse, PhotoboothAdminGetActiveSessionsResponse, PhotoboothAdminGetRecentSessionsData, PhotoboothAdminGetRecentSessionsResponse, PhotoboothAdminGetTransactionsData, PhotoboothAdminGetTransactionsResponse, PhotoboothAdminGetRevenueReportData, PhotoboothAdminGetRevenueReportResponse, PhotosUploadPhotosData, PhotosUploadPhotosResponse, PhotosGetPhotosBySessionData, PhotosGetPhotosBySessionResponse, PhotosGetPhotoData, PhotosGetPhotoResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
+import type { BoothsReadBoothsData, BoothsReadBoothsResponse, BoothsCreateBoothData, BoothsCreateBoothResponse, BoothsReadBoothData, BoothsReadBoothResponse, BoothsUpdateBoothData, BoothsUpdateBoothResponse, BoothsDeleteBoothData, BoothsDeleteBoothResponse, BoothsUpdateBoothConfigData, BoothsUpdateBoothConfigResponse, BoothsAssignDeviceData, BoothsAssignDeviceResponse, BoothsUnassignDeviceData, BoothsUnassignDeviceResponse, DevicesRegisterDeviceData, DevicesRegisterDeviceResponse, DevicesCheckDeviceAssignmentData, DevicesCheckDeviceAssignmentResponse, DevicesDeviceHeartbeatData, DevicesDeviceHeartbeatResponse, DevicesAssignDeviceByPinData, DevicesAssignDeviceByPinResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PaymentsCreatePaymentData, PaymentsCreatePaymentResponse, PaymentsCheckStatusData, PaymentsCheckStatusResponse, PaymentsPaymentNotifyResponse, PaymentsPaymentNotifyTestData, PaymentsPaymentNotifyTestResponse, PaymentsCreateDemoPaymentData, PaymentsCreateDemoPaymentResponse, PhotoboothAdminGetDashboardOverviewResponse, PhotoboothAdminGetRecentTransactionsData, PhotoboothAdminGetRecentTransactionsResponse, PhotoboothAdminGetActiveSessionsResponse, PhotoboothAdminGetRecentSessionsData, PhotoboothAdminGetRecentSessionsResponse, PhotoboothAdminGetTransactionsData, PhotoboothAdminGetTransactionsResponse, PhotoboothAdminGetRevenueReportData, PhotoboothAdminGetRevenueReportResponse, PhotosUploadPhotosData, PhotosUploadPhotosResponse, PhotosGetPhotosBySessionData, PhotosGetPhotosBySessionResponse, PhotosGetPhotoData, PhotosGetPhotoResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse, WebsocketGetOnlineDevicesResponse } from './types.gen';
 
 export class BoothsService {
     /**
@@ -1014,6 +1014,21 @@ export class UtilsService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/utils/health-check/'
+        });
+    }
+}
+
+export class WebsocketService {
+    /**
+     * Get Online Devices
+     * Get list of currently connected device IDs (superuser only).
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static getOnlineDevices(): CancelablePromise<WebsocketGetOnlineDevicesResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/ws/online-devices'
         });
     }
 }

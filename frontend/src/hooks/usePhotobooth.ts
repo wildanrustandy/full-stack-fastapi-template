@@ -3,6 +3,7 @@ import {
   BoothsService,
   PaymentsService,
   PhotoboothAdminService,
+  WebsocketService,
 } from "@/client"
 
 // Booth hooks
@@ -170,19 +171,39 @@ const useUnassignDevice = () => {
   })
 }
 
+// Online devices hook
+interface OnlineDevice {
+  device_id: string
+  device_name?: string
+  booth_id?: string
+  last_heartbeat?: string
+}
+
+const useOnlineDevices = () => {
+  return useQuery({
+    queryKey: ["online-devices"],
+    queryFn: async (): Promise<OnlineDevice[]> => {
+      const data = await WebsocketService.getOnlineDevices()
+      return data as unknown as OnlineDevice[]
+    },
+    refetchInterval: 10000,
+  })
+}
+
 export {
-  useBooths,
-  useBooth,
-  useDashboardOverview,
-  useRecentTransactions,
   useActiveSessions,
-  useRecentSessions,
-  useRevenueReport,
-  useCreatePayment,
-  useCreateDemoPayment,
+  useBooth,
+  useBooths,
   useCheckPaymentStatus,
   useCreateBooth,
-  useUpdateBooth,
+  useCreateDemoPayment,
+  useCreatePayment,
+  useDashboardOverview,
   useDeleteBooth,
+  useOnlineDevices,
+  useRecentSessions,
+  useRecentTransactions,
+  useRevenueReport,
   useUnassignDevice,
+  useUpdateBooth,
 }

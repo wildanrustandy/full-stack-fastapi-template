@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import EmailStr
 from sqlalchemy import JSON, DateTime, Numeric, Text
@@ -123,7 +123,7 @@ class ItemsPublic(SQLModel):
 # Booth
 # ---------------------------------------------------------------------------
 
-BOOTH_DEFAULT_CONFIG: dict = {
+BOOTH_DEFAULT_CONFIG: dict[str, Any] = {
     "price_per_print": 35000,
     "timer_default": 5,
     "max_print": 10,
@@ -139,7 +139,7 @@ class BoothBase(SQLModel):
 
 
 class BoothCreate(BoothBase):
-    config: dict | None = None
+    config: dict[str, Any] | None = None
 
 
 class BoothUpdate(SQLModel):
@@ -162,9 +162,9 @@ class Booth(BoothBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     device_id: str | None = Field(default=None, max_length=255, unique=True)
     current_session_id: uuid.UUID | None = Field(default=None)
-    config: dict = Field(
+    config: dict[str, Any] = Field(
         default_factory=lambda: dict(BOOTH_DEFAULT_CONFIG),
-        sa_type=JSON,  # type: ignore
+        sa_type=JSON,
     )
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
@@ -192,7 +192,7 @@ class BoothPublic(BoothBase):
     id: uuid.UUID
     device_id: str | None = None
     current_session_id: uuid.UUID | None = None
-    config: dict = Field(default_factory=lambda: dict(BOOTH_DEFAULT_CONFIG))
+    config: dict[str, Any] = Field(default_factory=lambda: dict(BOOTH_DEFAULT_CONFIG))
     created_at: datetime | None = None
     updated_at: datetime | None = None
     last_active_at: datetime | None = None
@@ -401,7 +401,7 @@ class Payment(PaymentBase, table=True):
         default="pending", max_length=20
     )  # pending, success, failed, expired
     reference_id: str | None = Field(default=None, max_length=100)
-    qr_string: str | None = Field(default=None, sa_type=Text)  # type: ignore
+    qr_string: str | None = Field(default=None, sa_type=Text)
     transaction_id: str | None = Field(default=None, max_length=255)
     paid_at: datetime | None = Field(
         default=None,
@@ -483,7 +483,7 @@ class PaymentConfig(PaymentConfigBase, table=True):
     production_va: str | None = Field(default=None, max_length=50)
     production_key: str | None = Field(default=None, max_length=100)
     production_url: str = Field(default="https://my.ipaymu.com", max_length=255)
-    notify_url: str | None = Field(default=None, sa_type=Text)  # type: ignore
+    notify_url: str | None = Field(default=None, sa_type=Text)
     is_active: bool = True
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
@@ -537,7 +537,7 @@ class ActivityLog(ActivityLogBase, table=True):
         default=None, foreign_key="user.id", ondelete="SET NULL"
     )
     admin_username: str | None = Field(default=None, max_length=50)
-    extra_data: str | None = Field(default=None, sa_type=Text)  # type: ignore
+    extra_data: str | None = Field(default=None, sa_type=Text)
     ip_address: str | None = Field(default=None, max_length=45)
     user_agent: str | None = Field(default=None, max_length=255)
     created_at: datetime | None = Field(

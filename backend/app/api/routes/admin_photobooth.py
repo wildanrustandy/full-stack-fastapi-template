@@ -78,7 +78,7 @@ def get_active_sessions(
     """Get active sessions with status 'pending' or 'paid' (superuser only)."""
     statement = (
         select(KioskSession)
-        .where(col(KioskSession.status).in_(["pending", "paid"]))  # type: ignore[union-attr]
+        .where(col(KioskSession.status).in_(["pending", "paid"]))
         .order_by(col(KioskSession.created_at).desc())
     )
     results = session.exec(statement).all()

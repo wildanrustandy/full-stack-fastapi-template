@@ -8,7 +8,7 @@ from sqlmodel import select
 
 from app import crud
 from app.api.deps import CurrentUser, SessionDep
-from app.models import BoothPublic, DeviceSession, DeviceSessionPublic
+from app.models import Booth, BoothPublic, DeviceSession, DeviceSessionPublic
 
 router = APIRouter(prefix="/devices", tags=["devices"])
 
@@ -73,7 +73,7 @@ def check_device_assignment(
 
     booth = None
     if device_session.booth_id:
-        booth = session.get(crud.Booth, device_session.booth_id)
+        booth = session.get(Booth, device_session.booth_id)
 
     # Consider booth inactive if booth exists but is not active
     booth_active = booth.is_active if booth else False

@@ -294,7 +294,7 @@ def create_photo(*, session: Session, photo_in: PhotoCreate) -> Photo:
 
 def get_photos_by_session(*, session: Session, session_id: uuid.UUID) -> list[Photo]:
     statement = (
-        select(Photo).where(Photo.session_id == session_id).order_by(col(Photo.order))  # type: ignore[arg-type]
+        select(Photo).where(Photo.session_id == session_id).order_by(col(Photo.order))
     )
     return list(session.exec(statement).all())
 

@@ -7,6 +7,7 @@ from sqlmodel import SQLModel
 from app import crud
 from app.api.deps import CurrentUser, SessionDep
 from app.models import (
+    Booth,
     BoothConfigUpdate,
     BoothCreate,
     BoothPublic,
@@ -167,7 +168,7 @@ async def unassign_device(
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
     # Get device_id before unassigning
-    booth = session.get(crud.Booth, id)
+    booth = session.get(Booth, id)
     if not booth:
         raise HTTPException(status_code=404, detail="Booth not found")
 
